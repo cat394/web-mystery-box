@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createTodosStore, getTodoAppDBHelper, getTodoAppDBObjectStoreHelperFactory, type TodosStore, type Todo, type Category } from '$lib/store';
+	import { createTodosStore, getTodoAppDB, getTodoAppDBObjectStoreHelperFactory, type TodosStore, type Todo, type Category } from '$lib/store';
 	import { TodoList, PageContainer } from '$lib/components';
 	import { isEmpty } from '$lib/utils';
 
@@ -10,8 +10,8 @@
 	let creatingTodo: boolean = $state(false);
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDBHelper();
-		const todosAppObjectStoreHelper = getTodoAppDBObjectStoreHelperFactory(dbHelper);
+		const db = await getTodoAppDB();
+		const todosAppObjectStoreHelper = getTodoAppDBObjectStoreHelperFactory(db);
 
 		async function makeTodosStore() {
 			const todosObjectStoreHelper = todosAppObjectStoreHelper<Todo>('todos');

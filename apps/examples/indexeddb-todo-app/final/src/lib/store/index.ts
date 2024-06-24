@@ -1,7 +1,7 @@
 import { type TodosStore, type Todo, createTodosStore } from './todos.svelte';
 import { type CategoryStore, type Category, createCategoryStore } from './categories.svelte';
 import {
-	getTodoAppDBHelper,
+	getTodoAppDB,
 	getTodoAppDBObjectStoreHelperFactory,
 	getTodosAppDBObjectStoreIndexHelper
 } from './setting/db';
@@ -13,7 +13,7 @@ export {
 	type Category,
 	createTodosStore,
 	createCategoryStore,
-	getTodoAppDBHelper,
+	getTodoAppDB,
 	getTodoAppDBObjectStoreHelperFactory,
 	getTodosAppDBObjectStoreIndexHelper
 };

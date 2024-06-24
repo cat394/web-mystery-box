@@ -73,7 +73,7 @@ export function createCategoryStore(
 	async function remove(id: Category['id']): StoreWriteOperationResult {
 		return await executeOperation(
 			categoriesSvelteStore.remove(id),
-			categoriesObjectStoreHelper.delete(id)
+			categoriesObjectStoreHelper.remove(id)
 		);
 	}
 

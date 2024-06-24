@@ -74,22 +74,22 @@ export class IDBObjectStoreHelper<
 	RecordType extends EssentialFields = EssentialFields
 > extends IDBHelper {
 	constructor(
-		public dbHelper: IDBDatabaseHelper,
+		public db: IDBDatabase,
 		public storeName: string
 	) {
 		super();
 	}
 
-	get #transaction() {
-		return this.dbHelper.startTransaction(this.storeName);
+	#getTransaction(transactionMode: IDBTransactionMode) {
+		return this.db.transaction(this.storeName, transactionMode);
 	}
 
 	get #readonlyTransaction() {
-		return this.#transaction('readonly');
+		return this.#getTransaction('readonly');
 	}
 
 	get #readwriteTransaction() {
-		return this.#transaction('readwrite');
+		return this.#getTransaction('readwrite');
 	}
 
 	#getObjectStore(transaction: IDBTransaction): IDBObjectStore {
@@ -139,7 +139,7 @@ export class IDBObjectStoreHelper<
 			return await super.requestResult<KeyType>(request);
 		};
 
-	delete =
+	remove =
 		<KeyType extends IDBValidKey = IDBValidKey>(key: KeyType): ObjectStoreOperation =>
 		async (): ObjectStoreOperationResult => {
 			const objectStore = this.#getObjectStore(this.#readwriteTransaction);

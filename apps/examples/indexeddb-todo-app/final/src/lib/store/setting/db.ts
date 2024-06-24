@@ -54,10 +54,10 @@ export const dbSettings = [todoAppDB] as const;
 
 const db = initDB<typeof dbSettings>(dbSettings);
 
-export const getTodoAppDBHelper = () => db<typeof todoAppDB>('todoApp');
+export const getTodoAppDB = async () => (await db<typeof todoAppDB>('todoApp')).db;
 
-export const getTodoAppDBObjectStoreHelperFactory = (dbHelper: IDBDatabaseHelper) => {
-	return createObjectStoreHelperFactory<typeof todoAppDB>(dbHelper);
+export const getTodoAppDBObjectStoreHelperFactory = (db: IDBDatabase) => {
+	return createObjectStoreHelperFactory<typeof todoAppDB>(db);
 };
 
 export const getTodosAppDBObjectStoreIndexHelper = <RecordType extends EssentialFields>(

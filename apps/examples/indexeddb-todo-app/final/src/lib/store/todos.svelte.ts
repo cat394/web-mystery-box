@@ -68,7 +68,7 @@ export function createTodosStore(
 	initialTodos: Todo[] = [],
 	todosObjectStoreHelper: IDBObjectStoreHelper<Todo>
 ): TodosStore {
-	const todosSvelteStore = new Todos(initialTodos);
+	const svelteTodosStore = new Todos(initialTodos);
 
 	async function add({
 		todo,
@@ -89,24 +89,24 @@ export function createTodosStore(
 		}
 
 		return await executeOperation(
-			todosSvelteStore.add(newTodo),
+			svelteTodosStore.add(newTodo),
 			todosObjectStoreHelper.add(newTodo)
 		);
 	}
 
 	async function remove(id: Todo['id']): StoreWriteOperationResult {
-		return await executeOperation(todosSvelteStore.remove(id), todosObjectStoreHelper.delete(id));
+		return await executeOperation(svelteTodosStore.remove(id), todosObjectStoreHelper.remove(id));
 	}
 
 	async function update(id: Todo['id'], updateInfo: Partial<Todo>): StoreWriteOperationResult {
 		return await executeOperation(
-			todosSvelteStore.update(id, updateInfo),
+			svelteTodosStore.update(id, updateInfo),
 			todosObjectStoreHelper.update(id, updateInfo)
 		);
 	}
 
 	return {
-		store: todosSvelteStore,
+		store: svelteTodosStore,
 		add,
 		remove,
 		update

@@ -15,11 +15,11 @@ export type DBNameFromDBSettings<T extends readonly DBSetting[]> =
 export type ObjectStoreNameFromDBSetting<T extends DBSetting> = T['objectStores'][number]['name'];
 
 export const createObjectStoreHelperFactory =
-	<const DBSettingType extends DBSetting>(dbHelper: IDBDatabaseHelper) =>
+	<const DBSettingType extends DBSetting>(db: IDBDatabase) =>
 	<RecordType extends EssentialFields>(
 		storeName: ObjectStoreNameFromDBSetting<DBSettingType>
 	): IDBObjectStoreHelper<RecordType> => {
-		return new IDBObjectStoreHelper<RecordType>(dbHelper, storeName);
+		return new IDBObjectStoreHelper<RecordType>(db, storeName);
 	};
 
 const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
@@ -43,7 +43,7 @@ export const initDB =
 
 		const { objectStores, dbVersion } = dbSetting;
 
-		const openDBHandler: OpenDBHandlers = {
+		const openDBHandlers: OpenDBHandlers = {
 			onupgradeneeded: (event: IDBVersionChangeEvent) => {
 				const db = (event.target as IDBOpenDBRequest).result;
 				objectStores.forEach((store) => {
@@ -70,7 +70,7 @@ export const initDB =
 			}
 		};
 
-		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandler);
+		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
 
 		const db = await dbHelper.init();
 
