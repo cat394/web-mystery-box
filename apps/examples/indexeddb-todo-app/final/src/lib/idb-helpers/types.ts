@@ -1,3 +1,5 @@
+import type { getId } from "$lib/utils";
+
 export type DBSetting = { dbName: string; dbVersion: number; objectStores: StoreDetail[] };
 
 export type IndexSetting = {
@@ -25,7 +27,7 @@ export type CursorHandlers = {
 };
 
 export interface EssentialFields {
-	id: string;
+	id: ReturnType<typeof getId>;
 }
 
 export type WriteOperationResult = IDBValidKey;
