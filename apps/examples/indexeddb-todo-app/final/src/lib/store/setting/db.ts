@@ -3,10 +3,10 @@ import {
 	IDBIndexHelper,
 	IDBObjectStoreHelper,
 	type DBSetting,
-	type EssentialFields
 } from '$lib/idb-helpers';
 import type { IndexNameFromDBSetting } from '$lib/idb-helpers/types';
 import { createObjectStoreHelperFactory, initDB } from '../helper-functions';
+import type { EssentialFields } from '../types';
 
 export const todoAppDB = {
 	dbName: 'todoApp',

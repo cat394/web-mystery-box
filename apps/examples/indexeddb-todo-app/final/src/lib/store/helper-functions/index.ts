@@ -2,10 +2,10 @@ import {
 	IDBDatabaseHelper,
 	IDBObjectStoreHelper,
 	type DBSetting,
-	type EssentialFields,
 	type IndexSetting,
 	type OpenDBHandlers
 } from '$lib/idb-helpers';
+import type { EssentialFields } from '../types';
 
 export type DBSettingFromDBSettings<T extends readonly DBSetting[]> = T[number];
 
