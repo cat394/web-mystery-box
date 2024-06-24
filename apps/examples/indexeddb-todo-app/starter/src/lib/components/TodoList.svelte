@@ -1,10 +1,8 @@
 <script lang="ts">
-	import type { Todo, Todos } from '$lib/store/todos.svelte';
-	import { flip } from 'svelte/animate';
-	import { send, receive } from '$lib/animations/transition';
+	import type { Todo, TodosStore } from '$lib/store/todos.svelte';
 
 	type Props = {
-		store: Todos;
+		store: TodosStore;
 		todos: Todo[];
 		header: string;
 		labelMessage: string;
@@ -17,7 +15,7 @@
 	<h2>{header}</h2>
 	<ul>
 		{#each todos as { id, completed, todo } ({ id })}
-			<li animate:flip={{ duration: 200 }} in:receive={{ key: id }} out:send={{ key: id }}>
+			<li>
 				<div class="todo-checkable-area">
 					<label>
 						<span class="sr-only">{labelMessage}</span>
