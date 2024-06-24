@@ -70,9 +70,9 @@
    await objectStoreHelper.update(KEY, UPDATEINFO);
   
   
-   - Delete a record:
+   - Remove a record:
   
-   await objectStoreHelper.delete(KEY);
+   await objectStoreHelper.remove(KEY);
     
   } catch {
     console.error(error);
