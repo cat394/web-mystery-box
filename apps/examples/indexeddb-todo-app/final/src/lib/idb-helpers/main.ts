@@ -1,11 +1,9 @@
 import type {
-	CursorHandlers,
+	DataRecord,
 	DBSetting,
-	EssentialFields,
 	IndexNameFromDBSetting,
-	ObjectStoreOperation,
-	ObjectStoreOperationResult,
-	OpenDBHandlers
+	OpenDBHandlers,
+	StoreWriteOperationResult
 } from './types';
 
 class IDBHelper {
@@ -26,7 +24,7 @@ class IDBHelper {
 	}
 }
 
-export class IDBDatabaseHelper<const T extends DBSetting = any> extends IDBHelper {
+export class IDBDatabaseHelper<T extends DBSetting = any> extends IDBHelper {
 	#db: IDBDatabase | undefined;
 
 	constructor(
@@ -62,16 +60,10 @@ export class IDBDatabaseHelper<const T extends DBSetting = any> extends IDBHelpe
 
 		return await this.requestResult<IDBDatabase>(request);
 	}
-
-	startTransaction =
-		(storeNames: DBSetting['objectStores'][number]['name']) =>
-		(mode: IDBTransactionMode = 'readonly'): IDBTransaction => {
-			return this.db.transaction(storeNames, mode);
-		};
 }
 
 export class IDBObjectStoreHelper<
-	RecordType extends EssentialFields = EssentialFields
+	RecordType extends DataRecord = DataRecord
 > extends IDBHelper {
 	constructor(
 		public db: IDBDatabase,
@@ -96,69 +88,65 @@ export class IDBObjectStoreHelper<
 		return transaction.objectStore(this.storeName);
 	}
 
-	get = async (key: IDBValidKey): Promise<RecordType> => {
+	async get(key: IDBValidKey): Promise<RecordType> {
 		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
 
 		const request = objectStore.get(key);
 
 		return await super.requestResult<RecordType>(request);
-	};
+	}
 
-	getAll = async (query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> => {
+	async getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> {
 		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
 
 		const request = objectStore.getAll(query, count);
 
 		return await super.requestResult<RecordType[]>(request);
-	};
+	}
 
-	add =
-		<KeyType extends IDBValidKey = IDBValidKey>(newData: RecordType): ObjectStoreOperation =>
-		async (): ObjectStoreOperationResult => {
-			const objectStore = this.#getObjectStore(this.#readwriteTransaction);
+	async add<KeyType extends IDBValidKey = IDBValidKey>(
+		newData: RecordType
+	): StoreWriteOperationResult {
+		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
 
-			const request = objectStore.add(newData);
+		const request = objectStore.add(newData);
 
-			return await super.requestResult<KeyType>(request);
-		};
+		return await super.requestResult<KeyType>(request);
+	}
 
-	update =
-		<KeyType extends IDBValidKey = IDBValidKey>(
-			key: KeyType,
-			newData: Partial<RecordType>
-		): ObjectStoreOperation =>
-		async (): ObjectStoreOperationResult => {
-			const currentData = await this.get(key);
+	async update<KeyType extends IDBValidKey = IDBValidKey>(
+		key: KeyType,
+		newData: Partial<RecordType>
+	): StoreWriteOperationResult {
+		const currentData = await this.get(key);
 
-			const merged = { ...currentData, ...newData };
+		const merged = { ...currentData, ...newData };
 
-			const objectStore = this.#getObjectStore(this.#readwriteTransaction);
+		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
 
-			const request = objectStore.put(merged);
+		const request = objectStore.put(merged);
 
-			return await super.requestResult<KeyType>(request);
-		};
+		return await super.requestResult<KeyType>(request);
+	}
 
-	remove =
-		<KeyType extends IDBValidKey = IDBValidKey>(key: KeyType): ObjectStoreOperation =>
-		async (): ObjectStoreOperationResult => {
-			const objectStore = this.#getObjectStore(this.#readwriteTransaction);
+	async remove<KeyType extends IDBValidKey = IDBValidKey>(key: KeyType): StoreWriteOperationResult {
+		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
 
-			const request = objectStore.delete(key);
+		const request = objectStore.delete(key);
 
-			return await super.requestResult<KeyType>(request);
-		};
+		return await super.requestResult<KeyType>(request);
+	}
 
-	getIndex = (indexName: string) => {
+	getIndex(indexName: string): IDBIndex {
 		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
 
 		return objectStore.index(indexName);
-	};
+	}
 }
 
 export class IDBIndexHelper<
 	DBSettingType extends DBSetting,
-	RecordType extends EssentialFields
+	RecordType extends DataRecord
 > extends IDBHelper {
 	constructor(
 		protected objectStoreHelper: IDBObjectStoreHelper<RecordType>,
@@ -171,32 +159,33 @@ export class IDBIndexHelper<
 		return this.objectStoreHelper.getIndex(this.indexName);
 	}
 
-	get = async (key: IDBValidKey): Promise<RecordType> => {
+	async get(key: IDBValidKey): Promise<RecordType> {
 		const request = this.#index.get(key);
 		return await super.requestResult<RecordType>(request);
-	};
+	}
 
-	getAll = async (query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> => {
+	async getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> {
 		const request = this.#index.getAll(query, count);
 		return await super.requestResult<RecordType[]>(request);
-	};
+	}
 
-	openCursor =
-		(query?: IDBValidKey | IDBKeyRange, direction?: IDBCursorDirection) =>
-		async (handler: CursorHandlers): Promise<void> => {
-			const request = this.#index.openCursor(query, direction);
+	async openCursor(
+		query?: IDBValidKey | IDBKeyRange,
+		direction?: IDBCursorDirection
+	): Promise<IDBCursor> {
+		const request = this.#index.openCursor(query, direction);
 
-			return new Promise((resolve, reject) => {
-				request.onsuccess = (event: Event) => {
-					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+		return new Promise((resolve, reject) => {
+			request.onsuccess = (event: Event) => {
+				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
 
-					handler.onsuccess(resolve, cursor);
-				};
-				request.onerror = (event: Event) => {
-					const error = (event.target as IDBRequest).error;
+				resolve(cursor);
+			};
+			request.onerror = (event: Event) => {
+				const error = (event.target as IDBRequest).error;
 
-					reject(error);
-				};
-			});
-		};
+				reject(error);
+			};
+		});
+	}
 }

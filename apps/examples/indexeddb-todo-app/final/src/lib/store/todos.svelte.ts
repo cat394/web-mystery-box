@@ -1,13 +1,7 @@
 import type { Category } from './categories.svelte';
-import type { EssentialFields, IDBObjectStoreHelper, WriteOperationResult } from '$lib/idb-helpers';
-import type {
-	ReturnCreateStoreFn,
-	StoreMethods,
-	StoreOperation,
-	StoreWriteOperationResult
-} from './types';
+import type { IDBObjectStoreHelper, StoreWriteOperationResult } from '$lib/idb-helpers';
+import type { EssentialFields, ReturnCreateStoreFn } from './types';
 import { getId } from '$lib/utils';
-import { executeOperation } from './executeOperation';
 import { isEmpty } from '$lib/utils';
 
 export interface Todo extends EssentialFields {
@@ -19,14 +13,14 @@ export interface Todo extends EssentialFields {
 
 type FieldNamesRequiredWhenAddingData = 'todo' | 'categoryIds';
 
-type ModifiableDataFields = Omit<Todo, 'id'>;
+type ModifiableDataFields = Pick<Todo, 'todo' | 'completed' | 'categoryIds'>;
 
 export type TodosStore = ReturnCreateStoreFn<
 	Todos,
 	ModifiableDataFields,
 	FieldNamesRequiredWhenAddingData
 >;
-export class Todos implements StoreMethods<Todo> {
+export class Todos {
 	todos = $state<Todo[]>([]);
 	remaining = $derived(this.todos.filter((todo) => !todo.completed));
 	finished = $derived(this.todos.filter((todo) => todo.completed));
@@ -35,33 +29,27 @@ export class Todos implements StoreMethods<Todo> {
 		this.todos = initialTodos;
 	}
 
-	add =
-		(newTodo: Todo): StoreOperation =>
-		(): WriteOperationResult => {
-			this.todos.push(newTodo);
+	add(newTodo: Todo): Todo['id'] {
+		this.todos.push(newTodo);
 
-			return newTodo.id;
-		};
+		return newTodo.id;
+	}
 
-	remove =
-		(id: Todo['id']): StoreOperation =>
-		(): WriteOperationResult => {
-			this.todos = this.todos.filter((todo) => todo.id !== id);
-			return id;
-		};
+	remove(id: Todo['id']): Todo['id'] {
+		this.todos = this.todos.filter((todo) => todo.id !== id);
+		return id;
+	}
 
-	update =
-		(id: Todo['id'], updateInfo: Partial<Todo>): StoreOperation =>
-		(): WriteOperationResult => {
-			this.todos = this.todos.map((todo) => {
-				if (todo.id !== id) return todo;
+	update(id: Todo['id'], updateInfo: Partial<Todo>): Todo['id'] {
+		this.todos = this.todos.map((todo) => {
+			if (todo.id !== id) return todo;
 
-				const merged = { ...todo, ...updateInfo };
+			const merged = { ...todo, ...updateInfo };
 
-				return merged;
-			});
-			return id;
-		};
+			return merged;
+		});
+		return id;
+	}
 }
 
 export function createTodosStore(
@@ -88,21 +76,19 @@ export function createTodosStore(
 			newTodo = { ...newTodo, categoryIds };
 		}
 
-		return await executeOperation(
-			svelteTodosStore.add(newTodo),
-			todosObjectStoreHelper.add(newTodo)
-		);
+		svelteTodosStore.add(newTodo);
+
+		return await todosObjectStoreHelper.add(newTodo);
 	}
 
 	async function remove(id: Todo['id']): StoreWriteOperationResult {
-		return await executeOperation(svelteTodosStore.remove(id), todosObjectStoreHelper.remove(id));
+		svelteTodosStore.remove(id);
+		return await todosObjectStoreHelper.remove(id);
 	}
 
 	async function update(id: Todo['id'], updateInfo: Partial<Todo>): StoreWriteOperationResult {
-		return await executeOperation(
-			svelteTodosStore.update(id, updateInfo),
-			todosObjectStoreHelper.update(id, updateInfo)
-		);
+		svelteTodosStore.update(id, updateInfo);
+		return await todosObjectStoreHelper.update(id, updateInfo);
 	}
 
 	return {
