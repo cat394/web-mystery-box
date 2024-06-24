@@ -1,12 +1,4 @@
-import type {
-	EssentialFields,
-	ObjectStoreOperationResult,
-	WriteOperationResult
-} from '$lib/idb-helpers';
-
-export type StoreOperation = () => WriteOperationResult;
-
-export type StoreWriteOperationResult = Promise<ObjectStoreOperationResult>;
+import type { StoreWriteOperationResult } from '$lib/idb-helpers/types';
 
 export interface ReturnCreateStoreFn<
 	SvelteStoreType,
@@ -21,10 +13,3 @@ export interface ReturnCreateStoreFn<
 	update: (id: string, newData: Partial<ModifiableDataFields>) => StoreWriteOperationResult;
 }
 
-export interface StoreMethods<StoreDataType extends EssentialFields> {
-	add(item: Partial<StoreDataType>): StoreOperation;
-
-	remove(id: StoreDataType['id']): StoreOperation;
-
-	update(id: StoreDataType['id'], updateItem: Partial<StoreDataType>): StoreOperation;
-}

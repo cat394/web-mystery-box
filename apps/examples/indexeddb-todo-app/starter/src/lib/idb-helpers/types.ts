@@ -19,22 +19,11 @@ export type OpenDBHandlers = {
 	onblocked: (event: IDBVersionChangeEvent) => void;
 };
 
-export type CursorHandlers = {
-	onsuccess: (
-		resolve: (value: void | PromiseLike<void>) => void,
-		cursor: IDBCursorWithValue
-	) => void;
-};
-
 export interface EssentialFields {
 	id: ReturnType<typeof getId>;
 }
 
-export type WriteOperationResult = IDBValidKey;
-
-export type ObjectStoreOperationResult = Promise<WriteOperationResult>;
-
-export type ObjectStoreOperation = () => ObjectStoreOperationResult;
+export type StoreWriteOperationResult = Promise<IDBValidKey>;
 
 export type IndexNameFromDBSetting<T extends DBSetting> = T['objectStores'][number]['indexes'] extends (infer I)[]
   ? I extends IndexSetting

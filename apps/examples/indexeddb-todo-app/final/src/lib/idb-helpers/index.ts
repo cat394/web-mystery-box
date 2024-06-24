@@ -5,13 +5,9 @@ import {
 } from './main';
 import type {
 	OpenDBHandlers,
-	CursorHandlers,
-	EssentialFields,
-	WriteOperationResult,
-	ObjectStoreOperation,
-	ObjectStoreOperationResult,
 	DBSetting,
-	IndexSetting
+	IndexSetting,
+	StoreWriteOperationResult
 } from './types';
 
 export {
@@ -19,11 +15,7 @@ export {
 	IDBObjectStoreHelper,
 	IDBIndexHelper,
 	type OpenDBHandlers,
-	type CursorHandlers,
-	type EssentialFields,
-	type WriteOperationResult,
-	type ObjectStoreOperation,
-	type ObjectStoreOperationResult,
 	type DBSetting,
-	type IndexSetting
+	type IndexSetting,
+	type StoreWriteOperationResult
 };
