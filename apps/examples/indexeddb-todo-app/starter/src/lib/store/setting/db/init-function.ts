@@ -1,26 +1,6 @@
-// import {
-// 	IDBDatabaseHelper,
-// 	IDBObjectStoreHelper,
-// 	type DBSetting,
-// 	type EssentialFields,
-// 	type IndexSetting,
-// 	type OpenDBHandlers
-// } from '$lib/idb-helpers';
+// import { IDBDatabaseHelper, type DBSetting, type OpenDBHandlers, type IndexSetting } from "$lib/idb-helpers";
+// import type { DBNameFromDBSettings, DBSettingFromDBSettings } from "./types";
 
-// export type DBSettingFromDBSettings<T extends readonly DBSetting[]> = T[number];
-
-// export type DBNameFromDBSettings<T extends readonly DBSetting[]> =
-// 	DBSettingFromDBSettings<T>['dbName'];
-
-// export type ObjectStoreNameFromDBSetting<T extends DBSetting> = T['objectStores'][number]['name'];
-
-// export const createObjectStoreHelperFactory =
-// 	<const DBSettingType extends DBSetting>(dbHelper: IDBDatabaseHelper) =>
-// 	<RecordType extends EssentialFields>(
-// 		storeName: ObjectStoreNameFromDBSetting<DBSettingType>
-// 	): IDBObjectStoreHelper<RecordType> => {
-// 		return new IDBObjectStoreHelper<RecordType>(dbHelper, storeName);
-// 	};
 
 // const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
 // 	const { name, keyPath, options } = indexSetting;
@@ -43,7 +23,7 @@
 
 // 		const { objectStores, dbVersion } = dbSetting;
 
-// 		const openDBHandler: OpenDBHandlers = {
+// 		const openDBHandlers: OpenDBHandlers = {
 // 			onupgradeneeded: (event: IDBVersionChangeEvent) => {
 // 				const db = (event.target as IDBOpenDBRequest).result;
 // 				objectStores.forEach((store) => {
@@ -70,7 +50,7 @@
 // 			}
 // 		};
 
-// 		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandler);
+// 		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
 
 // 		const db = await dbHelper.init();
 

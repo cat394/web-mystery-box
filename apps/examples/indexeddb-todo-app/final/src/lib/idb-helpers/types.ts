@@ -1,4 +1,6 @@
-export type DataRecord = Record<string, any>;
+export interface EssentialFields {
+	id: IDBValidKey;
+};
 
 export type DBSetting = { dbName: string; dbVersion: number; objectStores: StoreDetail[] };
 
@@ -14,15 +16,17 @@ type StoreDetail = {
 	indexes?: IndexSetting[];
 };
 
-export type OpenDBHandlers = {
+export interface OpenDBHandlers {
 	onupgradeneeded: (event: IDBVersionChangeEvent) => void;
 	onblocked: (event: IDBVersionChangeEvent) => void;
-};
+}
+export interface CursorHandler {
+	onsuccess: (
+		resolve: (value: any) => void,
+		cursor: IDBCursorWithValue
+	) => ReturnType<PromiseConstructor['resolve']>;
+}
 
-export type StoreWriteOperationResult = Promise<IDBValidKey>;
+export type StoreWriteOperationResult<T extends EssentialFields> = Promise<T['id']>;
 
-export type IndexNameFromDBSetting<T extends DBSetting> = T['objectStores'][number]['indexes'] extends (infer I)[]
-  ? I extends IndexSetting
-    ? I['name']
-    : never
-  : never;
+export type ObjectStoreNamesFromDBSetting<T extends DBSetting> = T['objectStores'][number]['name'];

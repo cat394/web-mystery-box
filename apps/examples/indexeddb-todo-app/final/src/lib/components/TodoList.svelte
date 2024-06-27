@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Todo, TodosStore } from '$lib/store/todos.svelte';
+	import type { Todo, TodoStore, CategoryStore } from '$lib/store';
 	import { flip } from 'svelte/animate';
 	import { send, receive } from '$lib/animations/transition';
 
 	type Props = {
-		store: TodosStore;
+		store: TodoStore;
 		todos: Todo[];
 		header: string;
 		labelMessage: string;
@@ -65,7 +65,7 @@
 		/* layout */
 		display: flex;
 		align-items: center;
-		padding: 10px;
+		padding: 0.63rem;
 
 		/* effect */
 		transition: all 300ms;

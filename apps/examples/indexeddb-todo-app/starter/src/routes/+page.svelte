@@ -1,5 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { PageContainer, TodoList } from '$lib/components';
+	import initialTodos from '$lib/data/todos';
 
+	onMount(async () => {});
+
+	async function handleAddTodoSubmit(event: SubmitEvent) {}
 </script>
 
 <!-- <PageContainer title="home">

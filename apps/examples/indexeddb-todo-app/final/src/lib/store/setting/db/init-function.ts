@@ -1,26 +1,6 @@
-import {
-	IDBDatabaseHelper,
-	IDBObjectStoreHelper,
-	type DBSetting,
-	type IndexSetting,
-	type OpenDBHandlers
-} from '$lib/idb-helpers';
-import type { EssentialFields } from '../types';
+import { IDBDatabaseHelper, type DBSetting, type IndexSetting, type OpenDBHandlers } from "$lib/idb-helpers";
+import type { DBNameFromDBSettings, DBSettingFromDBSettings } from "./types";
 
-export type DBSettingFromDBSettings<T extends readonly DBSetting[]> = T[number];
-
-export type DBNameFromDBSettings<T extends readonly DBSetting[]> =
-	DBSettingFromDBSettings<T>['dbName'];
-
-export type ObjectStoreNameFromDBSetting<T extends DBSetting> = T['objectStores'][number]['name'];
-
-export const createObjectStoreHelperFactory =
-	<const DBSettingType extends DBSetting>(db: IDBDatabase) =>
-	<RecordType extends EssentialFields>(
-		storeName: ObjectStoreNameFromDBSetting<DBSettingType>
-	): IDBObjectStoreHelper<RecordType> => {
-		return new IDBObjectStoreHelper<RecordType>(db, storeName);
-	};
 
 const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
 	const { name, keyPath, options } = indexSetting;

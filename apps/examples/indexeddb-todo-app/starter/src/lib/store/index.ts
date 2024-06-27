@@ -1,19 +1,13 @@
-// import { type TodosStore, type Todo, createTodosStore } from './todos.svelte';
-// import { type CategoryStore, type Category, createCategoryStore } from './categories.svelte';
 // import {
 // 	getTodoAppDBHelper,
-// 	getTodoAppDBObjectStoreHelperFactory,
-// 	getTodosAppDBObjectStoreIndexHelper
 // } from './setting/db';
+// import { TodoStore, type Todo } from './todos.svelte';
+// import { CategoryStore, type Category } from './categories.svelte';
 
 // export {
-// 	type TodosStore,
+// 	getTodoAppDBHelper
+// 	TodoStore,
+// 	CategoryStore,
 // 	type Todo,
-// 	type CategoryStore,
-// 	type Category,
-// 	createTodosStore,
-// 	createCategoryStore,
-// 	getTodoAppDBHelper,
-// 	getTodoAppDBObjectStoreHelperFactory,
-// 	getTodosAppDBObjectStoreIndexHelper
+// 	type Category
 // };

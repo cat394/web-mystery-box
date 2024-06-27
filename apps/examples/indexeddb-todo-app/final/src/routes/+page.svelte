@@ -1,40 +1,39 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createTodosStore, getTodoAppDB, getTodoAppDBObjectStoreHelperFactory, type TodosStore, type Todo, type Category } from '$lib/store';
+	import { getTodoAppDBHelper, TodoStore, type Todo, type Category } from '$lib/store';
 	import { TodoList, PageContainer } from '$lib/components';
 	import { isEmpty } from '$lib/utils';
+	import { IDBObjectStoreHelper } from '$lib/idb-helpers';
 
-	let todosStore = $state<TodosStore | undefined>();
+	let todoStore = $state<TodoStore | undefined>();
 	let categories = $state<Category[] | undefined>();
 
 	let creatingTodo: boolean = $state(false);
 
 	onMount(async () => {
-		const db = await getTodoAppDB();
-		const todosAppObjectStoreHelper = getTodoAppDBObjectStoreHelperFactory(db);
+		const dbHelper = await getTodoAppDBHelper();
 
 		async function makeTodosStore() {
-			const todosObjectStoreHelper = todosAppObjectStoreHelper<Todo>('todos');
+			const todosObjectStoreHelper = new IDBObjectStoreHelper<Todo>(dbHelper.db, 'todos');
+
 			const allTodos = await todosObjectStoreHelper.getAll();
-			todosStore = createTodosStore(allTodos, todosObjectStoreHelper);
+
+			todoStore = new TodoStore(allTodos, todosObjectStoreHelper);
 		}
 
 		async function getCategories() {
-			const categoriesObjectStoreHelper = todosAppObjectStoreHelper<Category>('categories');
+			const categoriesObjectStoreHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'categories');
+			
 			categories = await categoriesObjectStoreHelper.getAll();
 		}
 
 		await Promise.all([makeTodosStore(), getCategories()]);
 	});
 
-	function changeCreatingTodoState() {
-		creatingTodo = !creatingTodo;
-	}
-
 	async function handleAddTodoSubmit(event: SubmitEvent) {
-		if (!todosStore) return;
+		if (!todoStore) return;
 
-		changeCreatingTodoState();
+		creatingTodo = true;
 
 		event.preventDefault();
 
@@ -48,11 +47,11 @@
 
 		if (!todo) return;
 
-		await todosStore.add({ todo, categoryIds });
+		await todoStore.add({ todo, categoryIds });
 
 		form.reset();
 
-		changeCreatingTodoState();
+		creatingTodo = false;
 	}
 </script>
 
@@ -88,19 +87,19 @@
 		<section>
 			<h2>Todos</h2>
 			<div class="todos-container">
-				{#if todosStore}
+				{#if todoStore}
 					<div class="remaining">
 						<TodoList
-							store={todosStore}
-							todos={todosStore.store.remaining}
+							store={todoStore}
+							todos={todoStore.store.remaining}
 							header="Remaining:"
 							labelMessage="Todo is completed!"
 						/>
 					</div>
 					<div class="finished">
 						<TodoList
-							store={todosStore}
-							todos={todosStore.store.finished}
+							store={todoStore}
+							todos={todoStore.store.finished}
 							header="Finished:"
 							labelMessage="Todo is remaining!"
 						/>

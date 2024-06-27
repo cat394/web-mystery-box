@@ -1,7 +1,8 @@
 import type {
-	DataRecord,
+	CursorHandler,
 	DBSetting,
-	IndexNameFromDBSetting,
+	EssentialFields,
+	ObjectStoreNamesFromDBSetting,
 	OpenDBHandlers,
 	StoreWriteOperationResult
 } from './types';
@@ -24,12 +25,12 @@ class IDBHelper {
 	}
 }
 
-export class IDBDatabaseHelper<T extends DBSetting = any> extends IDBHelper {
+export class IDBDatabaseHelper<DBSettingType extends DBSetting> extends IDBHelper {
 	#db: IDBDatabase | undefined;
 
 	constructor(
-		public dbName: T['dbName'],
-		public version: number,
+		public dbName: DBSettingType['dbName'],
+		public dbVersion: number,
 		public handlers: OpenDBHandlers
 	) {
 		super();
@@ -45,6 +46,7 @@ export class IDBDatabaseHelper<T extends DBSetting = any> extends IDBHelper {
 	async init(): Promise<IDBDatabase> {
 		try {
 			this.#db = await this.openDB(this.handlers);
+
 			return this.#db;
 		} catch (error) {
 			throw new Error(`Failed to open database: ${error}`);
@@ -52,7 +54,7 @@ export class IDBDatabaseHelper<T extends DBSetting = any> extends IDBHelper {
 	}
 
 	async openDB(handler: OpenDBHandlers): Promise<IDBDatabase> {
-		const request = indexedDB.open(this.dbName, this.version);
+		const request = indexedDB.open(this.dbName, this.dbVersion);
 
 		request.onupgradeneeded = handler.onupgradeneeded;
 
@@ -60,11 +62,18 @@ export class IDBDatabaseHelper<T extends DBSetting = any> extends IDBHelper {
 
 		return await this.requestResult<IDBDatabase>(request);
 	}
+
+	transaction = (
+		storeNames:
+			| ObjectStoreNamesFromDBSetting<DBSettingType>
+			| ObjectStoreNamesFromDBSetting<DBSettingType>[],
+		transactionMode?: IDBTransactionMode
+	): IDBTransaction => {
+		return this.db.transaction(storeNames, transactionMode);
+	};
 }
 
-export class IDBObjectStoreHelper<
-	RecordType extends DataRecord = DataRecord
-> extends IDBHelper {
+export class IDBObjectStoreHelper<RecordType extends EssentialFields> extends IDBHelper {
 	constructor(
 		public db: IDBDatabase,
 		public storeName: string
@@ -72,114 +81,93 @@ export class IDBObjectStoreHelper<
 		super();
 	}
 
-	#getTransaction(transactionMode: IDBTransactionMode) {
-		return this.db.transaction(this.storeName, transactionMode);
+	getObjectStore(mode?: IDBTransactionMode) {
+		return this.db.transaction(this.storeName, mode).objectStore(this.storeName);
 	}
 
-	get #readonlyTransaction() {
-		return this.#getTransaction('readonly');
-	}
-
-	get #readwriteTransaction() {
-		return this.#getTransaction('readwrite');
-	}
-
-	#getObjectStore(transaction: IDBTransaction): IDBObjectStore {
-		return transaction.objectStore(this.storeName);
-	}
-
-	async get(key: IDBValidKey): Promise<RecordType> {
-		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
+	async get(key: RecordType['id']): Promise<RecordType> {
+		const objectStore = this.getObjectStore();
 
 		const request = objectStore.get(key);
 
 		return await super.requestResult<RecordType>(request);
 	}
 
-	async getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> {
-		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
+	async getAll(query?: IDBKeyRange, count?: number): Promise<RecordType[]> {
+		const objectStore = this.getObjectStore();
 
 		const request = objectStore.getAll(query, count);
 
 		return await super.requestResult<RecordType[]>(request);
 	}
 
-	async add<KeyType extends IDBValidKey = IDBValidKey>(
-		newData: RecordType
-	): StoreWriteOperationResult {
-		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
+	async add(newData: RecordType): StoreWriteOperationResult<RecordType> {
+		const objectStore = this.getObjectStore('readwrite');
 
 		const request = objectStore.add(newData);
 
-		return await super.requestResult<KeyType>(request);
+		return await super.requestResult<RecordType['id']>(request);
 	}
 
-	async update<KeyType extends IDBValidKey = IDBValidKey>(
-		key: KeyType,
+	async update(
+		key: RecordType['id'],
 		newData: Partial<RecordType>
-	): StoreWriteOperationResult {
+	): StoreWriteOperationResult<RecordType> {
 		const currentData = await this.get(key);
+
+		const objectStore = this.getObjectStore('readwrite');
 
 		const merged = { ...currentData, ...newData };
 
-		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
-
 		const request = objectStore.put(merged);
 
-		return await super.requestResult<KeyType>(request);
+		return await super.requestResult<RecordType['id']>(request);
 	}
 
-	async remove<KeyType extends IDBValidKey = IDBValidKey>(key: KeyType): StoreWriteOperationResult {
-		const objectStore = this.#getObjectStore(this.#readwriteTransaction);
+	async remove(key: RecordType['id']): StoreWriteOperationResult<RecordType> {
+		const objectStore = this.getObjectStore('readwrite');
 
 		const request = objectStore.delete(key);
 
-		return await super.requestResult<KeyType>(request);
-	}
-
-	getIndex(indexName: string): IDBIndex {
-		const objectStore = this.#getObjectStore(this.#readonlyTransaction);
-
-		return objectStore.index(indexName);
+		return await super.requestResult<RecordType['id']>(request);
 	}
 }
 
-export class IDBIndexHelper<
-	DBSettingType extends DBSetting,
-	RecordType extends DataRecord
-> extends IDBHelper {
+export class IDBIndexHelper<RecordType extends EssentialFields> extends IDBHelper {
+	index: IDBIndex;
+
 	constructor(
-		protected objectStoreHelper: IDBObjectStoreHelper<RecordType>,
-		protected indexName: IndexNameFromDBSetting<DBSettingType>
+		protected objectStore: IDBObjectStore,
+		protected indexName: string
 	) {
 		super();
+		this.index = this.objectStore.index(this.indexName);
 	}
 
-	get #index(): IDBIndex {
-		return this.objectStoreHelper.getIndex(this.indexName);
-	}
+	async get(key: RecordType['id']): Promise<RecordType> {
+		const request = this.index.get(key);
 
-	async get(key: IDBValidKey): Promise<RecordType> {
-		const request = this.#index.get(key);
 		return await super.requestResult<RecordType>(request);
 	}
 
-	async getAll(query?: IDBValidKey | IDBKeyRange, count?: number): Promise<RecordType[]> {
-		const request = this.#index.getAll(query, count);
+	async getAll(query?: RecordType['id'] | IDBKeyRange, count?: number): Promise<RecordType[]> {
+		const request = this.index.getAll(query, count);
+
 		return await super.requestResult<RecordType[]>(request);
 	}
 
 	async openCursor(
-		query?: IDBValidKey | IDBKeyRange,
+		cursorHandler: CursorHandler,
+		query?: RecordType['id'] | IDBKeyRange,
 		direction?: IDBCursorDirection
-	): Promise<IDBCursor> {
-		const request = this.#index.openCursor(query, direction);
+	): Promise<void> {
+		const request = this.index.openCursor(query, direction);
 
 		return new Promise((resolve, reject) => {
 			request.onsuccess = (event: Event) => {
 				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
 
-				resolve(cursor);
+				cursorHandler.onsuccess(resolve, cursor);
 			};
 			request.onerror = (event: Event) => {
 				const error = (event.target as IDBRequest).error;

@@ -1,92 +1,46 @@
-import type { IDBObjectStoreHelper } from '$lib/idb-helpers/main';
-import { getId } from '$lib/utils';
-import type { ReturnCreateStoreFn } from './types';
+// Part8-------------------------------------------------------------------------------------------
 
-export interface Todo {
-	id: ReturnType<typeof getId>;
-	todo: string;
-	completed: boolean;
-	createdAt: number;
-}
+// export interface Todo {}
 
-type FieldNamesRequiredWhenAddingData = 'todo';
+// export class Todos {
+// 	// These arrays should be reactive!
+// 	todos = [];
+// 	remaining = [];
+// 	finished = [];
 
-type ModifiableDataFields = Omit<Todo, 'id'>;
+// 	constructor(initialTodos: Todo[]) {
+// 		this.todos = initialTodos;
+// 	}
 
-export type TodosStore = ReturnCreateStoreFn<
-	Todos,
-	ModifiableDataFields,
-	FieldNamesRequiredWhenAddingData
->;
+// 	add() {}
 
-export class Todos {
-	todos = $state<Todo[]>([]);
-	remaining = $derived(this.todos.filter((todo) => !todo.completed));
-	finished = $derived(this.todos.filter((todo) => todo.completed));
+// 	remove() {}
 
-	constructor(initialTodos: Todo[]) {
-		this.todos = initialTodos;
-	}
+// 	update() {}
+// }
 
-	add(newTodo: Todo): Todo['id'] {
-		this.todos.push(newTodo);
+// -----------------------------------------------------------------------------------------------
 
-		return newTodo.id;
-	}
+// Part10-----------------------------------------------------------------------------------------
 
-	remove(id: Todo['id']): Todo['id'] {
-		this.todos = this.todos.filter((todo) => todo.id !== id);
+// export class TodoStore {
+// 	#svelteTodosStore: Todos;
+// 	#todosObjectStoreHelper: IDBObjectStoreHelper<Todo>;
 
-		return id;
-	}
+// 	constructor(initialTodos: Todo[], todosObjectStoreHelper: IDBObjectStoreHelper<Todo>) {
+// 		this.#svelteTodosStore = new Todos(initialTodos);
+// 		this.#todosObjectStoreHelper = todosObjectStoreHelper;
+// 	}
+// 	// To access the reactive data from outside, we use the store property, because the name 'svelteTodosStore' is too long!
+// 	get store() {
+// 		return this.#svelteTodosStore;
+// 	}
 
-	update(id: Todo['id'], updateInfo: Partial<Todo>): Todo['id'] {
-		this.todos = this.todos.map((todo) => {
-			if (todo.id !== id) return todo;
+// 	async add() {}
 
-			const merged = { ...todo, ...updateInfo };
+// 	async remove() {}
 
-			return merged;
-		});
+// 	async update() {}
+// }
 
-		return id;
-	}
-}
-
-export function createTodosStore(
-	initialTodos: Todo[],
-	todosObjectStoreHelper: IDBObjectStoreHelper
-): TodosStore {
-	const svelteTodosStore = new Todos(initialTodos);
-
-	async function add({ todo }: Pick<Todo, 'todo'>) {
-		const todoId = getId();
-
-		const newTodo: Todo = {
-			id: todoId,
-			todo,
-			completed: false,
-			createdAt: Date.now()
-		};
-
-		svelteTodosStore.add(newTodo);
-		return await todosObjectStoreHelper.add(newTodo);
-	}
-
-	async function update(id: Todo['id'], updateInfo: Partial<Todo>) {
-		svelteTodosStore.update(id, updateInfo);
-		return await todosObjectStoreHelper.update(id, updateInfo);
-	}
-
-	async function remove(id: Todo['id']) {
-		svelteTodosStore.remove(id);
-		return await todosObjectStoreHelper.remove(id);
-	}
-
-	return {
-		store: svelteTodosStore,
-		add,
-		update,
-		remove
-	};
-}
+// -------------------------------------------------------------------------------------------------

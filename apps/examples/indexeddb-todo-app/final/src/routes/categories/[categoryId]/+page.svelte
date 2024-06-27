@@ -1,29 +1,30 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import type { Category } from '$lib/store/categories.svelte';
-	import { type Todo, type TodosStore, createTodosStore } from '$lib/store/todos.svelte';
+	import { TodoStore, type Todo, type Category } from '$lib/store';
 	import { Table } from '$lib/components';
-	import { getTodoAppDBHelper, getTodoAppDBObjectStoreHelperFactory, getTodosAppDBObjectStoreIndexHelper } from '$lib/store';
+	import { getTodoAppDBHelper } from '$lib/store';
+	import { IDBIndexHelper, IDBObjectStoreHelper } from '$lib/idb-helpers';
 
+	const categoryId = $page.params.categoryId;
+	
 	let categoryName: string | undefined = $state();
-	let todosStore: TodosStore | undefined = $state();
+	let todoStore: TodoStore | undefined = $state();
 
 	onMount(async () => {
 		const dbHelper = await getTodoAppDBHelper();
-		const todosAppObjectStoreHelper = getTodoAppDBObjectStoreHelperFactory(dbHelper);
-		const categoryId = $page.params.categoryId;
 
 		async function findCategoryName() {
-			const categoriesObjectStoreHelper = todosAppObjectStoreHelper<Category>('categories');
-			categoryName = (await categoriesObjectStoreHelper.get(categoryId)).name;
+			const storeHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'categories');
+			categoryName = (await storeHelper.get(categoryId)).name;
 		}
 
 		async function getCategoryTodos() {
-			const todosObjectStoreHelper = todosAppObjectStoreHelper<Todo>('todos');
-			const todosHelper = getTodosAppDBObjectStoreIndexHelper<Todo>(todosObjectStoreHelper, 'category');
-			const todos = await todosHelper.getAll(categoryId);
-			todosStore = createTodosStore(todos, todosObjectStoreHelper);
+			const storeHelper = new IDBObjectStoreHelper<Todo>(dbHelper.db, 'todos');
+			const objectStore = storeHelper.getObjectStore();
+			const indexHelper = new IDBIndexHelper<Todo>(objectStore, 'category');
+			const todos = await indexHelper.getAll(categoryId);
+			todoStore = new TodoStore(todos, storeHelper);
 		}
 
 		await Promise.all([findCategoryName(), getCategoryTodos()]);
@@ -34,6 +35,6 @@
 	<h1>Category: {categoryName}</h1>
 {/if}
 
-{#if todosStore}
-	<Table dataObjects={todosStore.store.todos} />
+{#if todoStore}
+	<Table dataObjects={todoStore.store.todos} />
 {/if}

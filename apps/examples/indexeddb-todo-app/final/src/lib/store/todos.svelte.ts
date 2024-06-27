@@ -1,6 +1,8 @@
-import type { Category } from './categories.svelte';
-import type { IDBObjectStoreHelper, StoreWriteOperationResult } from '$lib/idb-helpers';
-import type { EssentialFields, ReturnCreateStoreFn } from './types';
+import type {
+	IDBObjectStoreHelper,
+	StoreWriteOperationResult,
+	EssentialFields
+} from '$lib/idb-helpers';
 import { getId } from '$lib/utils';
 import { isEmpty } from '$lib/utils';
 
@@ -8,18 +10,9 @@ export interface Todo extends EssentialFields {
 	todo: string;
 	completed: boolean;
 	createdAt: number;
-	categoryIds?: Category['id'][];
+	categoryIds?: string[];
 }
 
-type FieldNamesRequiredWhenAddingData = 'todo' | 'categoryIds';
-
-type ModifiableDataFields = Pick<Todo, 'todo' | 'completed' | 'categoryIds'>;
-
-export type TodosStore = ReturnCreateStoreFn<
-	Todos,
-	ModifiableDataFields,
-	FieldNamesRequiredWhenAddingData
->;
 export class Todos {
 	todos = $state<Todo[]>([]);
 	remaining = $derived(this.todos.filter((todo) => !todo.completed));
@@ -52,20 +45,24 @@ export class Todos {
 	}
 }
 
-export function createTodosStore(
-	initialTodos: Todo[] = [],
-	todosObjectStoreHelper: IDBObjectStoreHelper<Todo>
-): TodosStore {
-	const svelteTodosStore = new Todos(initialTodos);
+export class TodoStore {
+	#svelteTodosStore: Todos;
+	#todosObjectStoreHelper: IDBObjectStoreHelper<Todo>;
 
-	async function add({
+	constructor(initialTodos: Todo[], todosObjectStoreHelper: IDBObjectStoreHelper<Todo>) {
+		this.#svelteTodosStore = new Todos(initialTodos);
+		this.#todosObjectStoreHelper = todosObjectStoreHelper;
+	}
+
+	get store() {
+		return this.#svelteTodosStore;
+	}
+
+	async add({
 		todo,
 		categoryIds
-	}: {
-		todo: Todo['todo'];
-		categoryIds: Exclude<Todo['categoryIds'], undefined>;
-	}): StoreWriteOperationResult {
-		let newTodo: Todo = {
+	}: Required<Pick<Todo, 'todo' | 'categoryIds'>>): StoreWriteOperationResult<Todo> {
+		let newTodo: Omit<Todo, 'categoryIds'> = {
 			id: getId(),
 			todo,
 			completed: false,
@@ -73,28 +70,20 @@ export function createTodosStore(
 		};
 
 		if (!isEmpty(categoryIds)) {
-			newTodo = { ...newTodo, categoryIds };
+			newTodo = { ...newTodo, categoryIds } as Todo;
 		}
 
-		svelteTodosStore.add(newTodo);
-
-		return await todosObjectStoreHelper.add(newTodo);
+		this.#svelteTodosStore.add(newTodo);
+		return await this.#todosObjectStoreHelper.add(newTodo);
 	}
 
-	async function remove(id: Todo['id']): StoreWriteOperationResult {
-		svelteTodosStore.remove(id);
-		return await todosObjectStoreHelper.remove(id);
+	async remove(id: Todo['id']): StoreWriteOperationResult<Todo> {
+		this.#svelteTodosStore.remove(id);
+		return await this.#todosObjectStoreHelper.remove(id);
 	}
 
-	async function update(id: Todo['id'], updateInfo: Partial<Todo>): StoreWriteOperationResult {
-		svelteTodosStore.update(id, updateInfo);
-		return await todosObjectStoreHelper.update(id, updateInfo);
+	async update(id: Todo['id'], updateInfo: Partial<Todo>): StoreWriteOperationResult<Todo> {
+		this.#svelteTodosStore.update(id, updateInfo);
+		return await this.#todosObjectStoreHelper.update(id, updateInfo);
 	}
-
-	return {
-		store: svelteTodosStore,
-		add,
-		remove,
-		update
-	};
 }

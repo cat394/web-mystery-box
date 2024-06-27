@@ -1,14 +1,5 @@
-import {
-	IDBDatabaseHelper,
-	IDBObjectStoreHelper,
-	IDBIndexHelper,
-} from './main';
-import type {
-	OpenDBHandlers,
-	DBSetting,
-	IndexSetting,
-	StoreWriteOperationResult
-} from './types';
+import { IDBDatabaseHelper, IDBObjectStoreHelper, IDBIndexHelper } from './main';
+import type { OpenDBHandlers, DBSetting, IndexSetting, StoreWriteOperationResult, EssentialFields } from './types';
 
 export {
 	IDBDatabaseHelper,
@@ -17,5 +8,6 @@ export {
 	type OpenDBHandlers,
 	type DBSetting,
 	type IndexSetting,
-	type StoreWriteOperationResult
+	type StoreWriteOperationResult,
+	type EssentialFields
 };

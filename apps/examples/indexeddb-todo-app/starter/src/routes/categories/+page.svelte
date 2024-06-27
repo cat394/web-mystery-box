@@ -1,8 +1,50 @@
-<script lang="ts">
+<!-- <script lang="ts">
+	import { getTodoAppDBHelper } from '$lib/store/setting/db';
+	import { isEmpty } from '$lib/utils';
+	import { onMount } from 'svelte';
+	import { type Category, CategoryStore } from '$lib/store';
+	import PageContainer from '$lib/components/PageContainer.svelte';
+	import { IDBObjectStoreHelper } from '$lib/idb-helpers';
 
+	let categoryStore = $state<CategoryStore | undefined>();
+	let creatingCategory = $state<boolean>(false);
+
+	onMount(async () => {
+		const dbHelper = await getTodoAppDBHelper();
+
+		async function makeCategoriessStore() {
+			const storeHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'categories');
+			const allCategories = await storeHelper.getAll();
+			categoryStore = new CategoryStore(allCategories, storeHelper);
+		}
+
+		await makeCategoriessStore();
+	});
+
+	async function handleAddCategorySubmit(event: SubmitEvent) {
+		if (!categoryStore) return;
+
+		event.preventDefault();
+
+		creatingCategory = true;
+
+		const form = event.target as HTMLFormElement;
+
+		const formData = new FormData(form);
+
+		const categoryName = formData.get('todo') as string;
+
+		if (!categoryName) return;
+
+		await categoryStore.add({ name: categoryName });
+
+		form.reset();
+
+		creatingCategory = false;
+	}
 </script>
 
-<!-- <PageContainer title="categories">
+<PageContainer title="categories">
 	{#snippet leftContent()}
 		<section>
 			<form onsubmit={handleAddCategorySubmit}>
@@ -31,7 +73,7 @@
 			{/if}
 		</section>
 	{/snippet}
-</PageContainer> -->
+</PageContainer>
 
 <style>
 	ul {
@@ -43,4 +85,4 @@
 	label {
 		margin-block-end: 1.2rem;
 	}
-</style>
+</style> -->

@@ -1,14 +1,13 @@
-import type { IDBObjectStoreHelper, StoreWriteOperationResult } from '$lib/idb-helpers';
+import type {
+	IDBObjectStoreHelper,
+	StoreWriteOperationResult,
+	EssentialFields
+} from '$lib/idb-helpers';
 import { getId } from '$lib/utils';
-import type { EssentialFields, ReturnCreateStoreFn } from './types';
 
 export interface Category extends EssentialFields {
 	name: string;
 }
-
-type ModifiableDataFields = Pick<Category, 'name'>;
-
-export type CategoryStore = ReturnCreateStoreFn<Categories, ModifiableDataFields>;
 
 export class Categories {
 	categories = $state<Category[]>([]);
@@ -28,11 +27,11 @@ export class Categories {
 		return id;
 	}
 
-	update(id: Category['id'], updateTodo: Partial<Category>): Category['id'] {
+	update(id: Category['id'], updateInfo: Partial<Category>): Category['id'] {
 		this.categories = this.categories.map((category) => {
 			if (category.id !== id) return category;
 
-			const merged = { ...category, ...updateTodo };
+			const merged = { ...category, ...updateInfo };
 
 			return merged;
 		});
@@ -40,39 +39,39 @@ export class Categories {
 	}
 }
 
-export function createCategoryStore(
-	initialCategories: Category[],
-	categoriesObjectStoreHelper: IDBObjectStoreHelper<Category>
-): CategoryStore {
-	const categoriesSvelteStore = new Categories(initialCategories);
+export class CategoryStore {
+	#svelteCategoriesStore: Categories;
+	#categoriesObjectStoreHelper: IDBObjectStoreHelper<Category>;
 
-	async function add({ name }: Pick<Category, 'name'>): StoreWriteOperationResult {
+	constructor(
+		initialCategories: Category[] = [],
+		categoriesObjectStoreHelper: IDBObjectStoreHelper<Category>
+	) {
+		this.#svelteCategoriesStore = new Categories(initialCategories);
+		this.#categoriesObjectStoreHelper = categoriesObjectStoreHelper;
+	}
+
+	get store() {
+		return this.#svelteCategoriesStore;
+	}
+
+	async add({ name }: Pick<Category, 'name'>): StoreWriteOperationResult<Category> {
 		const newCategory: Category = {
 			id: getId(),
 			name
 		};
 
-		categoriesSvelteStore.add(newCategory);
-		return await categoriesObjectStoreHelper.add(newCategory);
+		this.#svelteCategoriesStore.add(newCategory);
+		return await this.#categoriesObjectStoreHelper.add(newCategory);
 	}
 
-	async function remove(id: Category['id']): StoreWriteOperationResult {
-		categoriesSvelteStore.remove(id);
-		return await categoriesObjectStoreHelper.remove(id);
+	async remove(id: Category['id']): StoreWriteOperationResult<Category> {
+		this.#svelteCategoriesStore.remove(id);
+		return await this.#categoriesObjectStoreHelper.remove(id);
 	}
 
-	async function update(
-		id: Category['id'],
-		updateInfo: Partial<Category>
-	): StoreWriteOperationResult {
-		categoriesSvelteStore.update(id, updateInfo);
-		return await categoriesObjectStoreHelper.update(id, updateInfo);
+	async update(id: Category['id'], updateInfo: Partial<Category>): StoreWriteOperationResult<Category> {
+		this.#svelteCategoriesStore.update(id, updateInfo);
+		return await this.#categoriesObjectStoreHelper.update(id, updateInfo);
 	}
-
-	return {
-		store: categoriesSvelteStore,
-		add,
-		remove,
-		update
-	};
 }

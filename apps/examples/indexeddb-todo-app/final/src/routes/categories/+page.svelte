@@ -1,36 +1,32 @@
 <script lang="ts">
-	import { getTodoAppDBHelper, getTodoAppDBObjectStoreHelperFactory } from '$lib/store/setting/db';
+	import { getTodoAppDBHelper } from '$lib/store/setting/db';
 	import { isEmpty } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { type Category, type CategoryStore, createCategoryStore } from '$lib/store';
-	import PageContainer from '$lib/components/PageContainer.svelte';
+	import { CategoryStore, type Category } from '$lib/store';
+	import { PageContainer } from '$lib/components';
+	import { IDBObjectStoreHelper } from '$lib/idb-helpers';
 
 	let categoryStore = $state<CategoryStore | undefined>();
 	let creatingCategory = $state<boolean>(false);
 
 	onMount(async () => {
 		const dbHelper = await getTodoAppDBHelper();
-		const todosAppObjectStoreHelper = getTodoAppDBObjectStoreHelperFactory(dbHelper);
 
 		async function makeCategoriessStore() {
-			const categoriesObjectStoreHelper = todosAppObjectStoreHelper<Category>('categories');
-			const allCategories = await categoriesObjectStoreHelper.getAll();
-			categoryStore = createCategoryStore(allCategories, categoriesObjectStoreHelper);
+			const storeHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'todos');
+			const allCategories = await storeHelper.getAll();
+			categoryStore = new CategoryStore(allCategories, storeHelper);
 		}
 
 		await makeCategoriessStore();
 	});
-
-	function changeCreatingCategoryState() {
-		creatingCategory = !creatingCategory;
-	}
 
 	async function handleAddCategorySubmit(event: SubmitEvent) {
 		if (!categoryStore) return;
 
 		event.preventDefault();
 
-		changeCreatingCategoryState();
+		creatingCategory = true;
 
 		const form = event.target as HTMLFormElement;
 
@@ -44,7 +40,7 @@
 
 		form.reset();
 
-		changeCreatingCategoryState();
+		creatingCategory = false;
 	}
 </script>
 
