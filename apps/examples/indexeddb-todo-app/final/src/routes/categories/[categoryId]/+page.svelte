@@ -3,28 +3,29 @@
 	import { onMount } from 'svelte';
 	import { TodoStore, type Todo, type Category } from '$lib/store';
 	import { Table } from '$lib/components';
-	import { getTodoAppDBHelper } from '$lib/store';
-	import { IDBIndexHelper, IDBObjectStoreHelper } from '$lib/idb-helpers';
+	import { getTodoAppDB } from '$lib/store';
 
 	const categoryId = $page.params.categoryId;
-	
+
 	let categoryName: string | undefined = $state();
 	let todoStore: TodoStore | undefined = $state();
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDBHelper();
+		const dbHelper = await getTodoAppDB();
+		const transaction = dbHelper.transaction(['todos', 'categories']);
 
 		async function findCategoryName() {
-			const storeHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'categories');
+			const storeHelper = transaction.objectStore<Category>('categories');
 			categoryName = (await storeHelper.get(categoryId)).name;
 		}
 
 		async function getCategoryTodos() {
-			const storeHelper = new IDBObjectStoreHelper<Todo>(dbHelper.db, 'todos');
-			const objectStore = storeHelper.getObjectStore();
-			const indexHelper = new IDBIndexHelper<Todo>(objectStore, 'category');
-			const todos = await indexHelper.getAll(categoryId);
-			todoStore = new TodoStore(todos, storeHelper);
+			const range = IDBKeyRange.only(categoryId);
+			const todos = await transaction
+				.objectStore<Todo>('todos')
+				.index<'todos'>('category')
+				.getAll(range);
+			todoStore = new TodoStore(dbHelper, todos);
 		}
 
 		await Promise.all([findCategoryName(), getCategoryTodos()]);

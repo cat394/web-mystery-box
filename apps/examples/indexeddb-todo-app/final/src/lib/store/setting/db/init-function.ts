@@ -1,6 +1,10 @@
-import { IDBDatabaseHelper, type DBSetting, type IndexSetting, type OpenDBHandlers } from "$lib/idb-helpers";
-import type { DBNameFromDBSettings, DBSettingFromDBSettings } from "./types";
-
+import {
+	IDBDatabaseManager,
+	type DBSetting,
+	type IndexSetting,
+	type InitDBHandlers
+} from '$lib/idb-helpers';
+import type { DBNameFromDBSettings, DBSettingFromDBSettings } from './types';
 
 const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
 	const { name, keyPath, options } = indexSetting;
@@ -14,7 +18,7 @@ export const initDB =
 	<T1 extends readonly DBSetting[]>(dbSettings: T1) =>
 	async <T2 extends DBSettingFromDBSettings<T1>>(
 		dbName: DBNameFromDBSettings<T1>
-	): Promise<IDBDatabaseHelper<T2>> => {
+	): Promise<IDBDatabaseManager<T2>> => {
 		const dbSetting = dbSettings.find((dbSetting) => dbSetting.dbName === dbName);
 
 		if (!dbSetting) {
@@ -23,9 +27,8 @@ export const initDB =
 
 		const { objectStores, dbVersion } = dbSetting;
 
-		const openDBHandlers: OpenDBHandlers = {
-			onupgradeneeded: (event: IDBVersionChangeEvent) => {
-				const db = (event.target as IDBOpenDBRequest).result;
+		const handlers: InitDBHandlers = {
+			onupgradeneeded: (db: IDBDatabase) => {
 				objectStores.forEach((store) => {
 					let objectStore: IDBObjectStore;
 
@@ -47,17 +50,16 @@ export const initDB =
 				if (reloadOK) {
 					window.location.reload();
 				}
+			},
+			onversionchange: (db: IDBDatabase) => {
+				db.close();
+				alert('A new version of this page is ready, please reload or close this tab!');
 			}
 		};
 
-		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
+		const dbHelper = new IDBDatabaseManager<T2>(dbName, dbVersion, handlers);
 
-		const db = await dbHelper.init();
-
-		db.onversionchange = () => {
-			db.close();
-			alert('A new version of this page is ready, please reload or close this tab!');
-		};
+		await dbHelper.init();
 
 		return dbHelper;
 	};

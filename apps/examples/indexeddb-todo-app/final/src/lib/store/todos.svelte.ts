@@ -1,10 +1,12 @@
 import type {
-	IDBObjectStoreHelper,
+	IDBObjectStoreManager,
 	StoreWriteOperationResult,
-	EssentialFields
+	EssentialFields,
+	IDBDatabaseManager
 } from '$lib/idb-helpers';
 import { getId } from '$lib/utils';
 import { isEmpty } from '$lib/utils';
+import type { todoAppDB } from './setting/db/seed';
 
 export interface Todo extends EssentialFields {
 	todo: string;
@@ -46,16 +48,20 @@ export class Todos {
 }
 
 export class TodoStore {
+	#db: IDBDatabaseManager<typeof todoAppDB>;
 	#svelteTodosStore: Todos;
-	#todosObjectStoreHelper: IDBObjectStoreHelper<Todo>;
 
-	constructor(initialTodos: Todo[], todosObjectStoreHelper: IDBObjectStoreHelper<Todo>) {
+	constructor(dbHelper: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
+		this.#db = dbHelper;
 		this.#svelteTodosStore = new Todos(initialTodos);
-		this.#todosObjectStoreHelper = todosObjectStoreHelper;
 	}
 
 	get store() {
 		return this.#svelteTodosStore;
+	}
+
+	get #objectStore() {
+		return this.#db.transaction(['todos']).objectStore<Todo>('todos');
 	}
 
 	async add({
@@ -74,16 +80,16 @@ export class TodoStore {
 		}
 
 		this.#svelteTodosStore.add(newTodo);
-		return await this.#todosObjectStoreHelper.add(newTodo);
+		return await this.#objectStore.add(newTodo);
 	}
 
 	async remove(id: Todo['id']): StoreWriteOperationResult<Todo> {
 		this.#svelteTodosStore.remove(id);
-		return await this.#todosObjectStoreHelper.remove(id);
+		return await this.#objectStore.remove(id);
 	}
 
 	async update(id: Todo['id'], updateInfo: Partial<Todo>): StoreWriteOperationResult<Todo> {
 		this.#svelteTodosStore.update(id, updateInfo);
-		return await this.#todosObjectStoreHelper.update(id, updateInfo);
+		return await this.#objectStore.update(id, updateInfo);
 	}
 }

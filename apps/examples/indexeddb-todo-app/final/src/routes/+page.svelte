@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getTodoAppDBHelper, TodoStore, type Todo, type Category } from '$lib/store';
+	import { getTodoAppDB, TodoStore, type Todo, type Category } from '$lib/store';
 	import { TodoList, PageContainer } from '$lib/components';
 	import { isEmpty } from '$lib/utils';
-	import { IDBObjectStoreHelper } from '$lib/idb-helpers';
 
 	let todoStore = $state<TodoStore | undefined>();
 	let categories = $state<Category[] | undefined>();
@@ -11,20 +10,21 @@
 	let creatingTodo: boolean = $state(false);
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDBHelper();
+		const dbHelper = await getTodoAppDB();
+		const transaction = dbHelper.transaction(['todos', 'categories']);
 
 		async function makeTodosStore() {
-			const todosObjectStoreHelper = new IDBObjectStoreHelper<Todo>(dbHelper.db, 'todos');
+			const objectStore = transaction.objectStore<Todo>('todos');
 
-			const allTodos = await todosObjectStoreHelper.getAll();
+			const allTodos = await objectStore.getAll();
 
-			todoStore = new TodoStore(allTodos, todosObjectStoreHelper);
+			todoStore = new TodoStore(dbHelper, allTodos);
 		}
 
 		async function getCategories() {
-			const categoriesObjectStoreHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'categories');
-			
-			categories = await categoriesObjectStoreHelper.getAll();
+			const objectStore = transaction.objectStore<Category>('categories');
+
+			categories = await objectStore.getAll();
 		}
 
 		await Promise.all([makeTodosStore(), getCategories()]);

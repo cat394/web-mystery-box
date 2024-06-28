@@ -1,11 +1,11 @@
 // import {
-// 	getTodoAppDBHelper,
+// 	getTodoAppDB,
 // } from './setting/db';
 // import { TodoStore, type Todo } from './todos.svelte';
 // import { CategoryStore, type Category } from './categories.svelte';
 
 // export {
-// 	getTodoAppDBHelper
+// 	getTodoAppDB
 // 	TodoStore,
 // 	CategoryStore,
 // 	type Todo,

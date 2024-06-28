@@ -1,11 +1,17 @@
-import { IDBDatabaseHelper, IDBObjectStoreHelper, IDBIndexHelper } from './main';
-import type { OpenDBHandlers, DBSetting, IndexSetting, StoreWriteOperationResult, EssentialFields } from './types';
+import { IDBDatabaseManager, IDBObjectStoreManager, IDBIndexManager } from './main';
+import type {
+	InitDBHandlers,
+	DBSetting,
+	IndexSetting,
+	StoreWriteOperationResult,
+	EssentialFields
+} from './types';
 
 export {
-	IDBDatabaseHelper,
-	IDBObjectStoreHelper,
-	IDBIndexHelper,
-	type OpenDBHandlers,
+	IDBDatabaseManager,
+	IDBObjectStoreManager,
+	IDBIndexManager,
+	type InitDBHandlers,
 	type DBSetting,
 	type IndexSetting,
 	type StoreWriteOperationResult,

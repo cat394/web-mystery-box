@@ -24,17 +24,23 @@
 // Part10-----------------------------------------------------------------------------------------
 
 // export class TodoStore {
-// 	#svelteTodosStore: Todos;
-// 	#todosObjectStoreHelper: IDBObjectStoreHelper<Todo>;
+//  #db: IDBDatabaseManager<typeof todoAppDB>;
+//  #svelteTodosStore: Todos;
 
-// 	constructor(initialTodos: Todo[], todosObjectStoreHelper: IDBObjectStoreHelper<Todo>) {
-// 		this.#svelteTodosStore = new Todos(initialTodos);
-// 		this.#todosObjectStoreHelper = todosObjectStoreHelper;
-// 	}
+
+//  constructor(dbHelper: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
+//    this.#db = dbHelper;
+//    this.#svelteTodosStore = new Todos(initialTodos);
+//  }
+
 // 	// To access the reactive data from outside, we use the store property, because the name 'svelteTodosStore' is too long!
 // 	get store() {
 // 		return this.#svelteTodosStore;
 // 	}
+
+//   get #objectStore() {
+//     return this.#db.transaction(['todos']).objectStore<Todo>('todos');
+//   }
 
 // 	async add() {}
 

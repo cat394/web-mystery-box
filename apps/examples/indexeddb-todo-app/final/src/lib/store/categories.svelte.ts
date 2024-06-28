@@ -1,9 +1,10 @@
 import type {
-	IDBObjectStoreHelper,
 	StoreWriteOperationResult,
-	EssentialFields
+	EssentialFields,
+	IDBDatabaseManager
 } from '$lib/idb-helpers';
 import { getId } from '$lib/utils';
+import type { todoAppDB } from './setting/db/seed';
 
 export interface Category extends EssentialFields {
 	name: string;
@@ -40,19 +41,20 @@ export class Categories {
 }
 
 export class CategoryStore {
+	#db: IDBDatabaseManager<typeof todoAppDB>;
 	#svelteCategoriesStore: Categories;
-	#categoriesObjectStoreHelper: IDBObjectStoreHelper<Category>;
 
-	constructor(
-		initialCategories: Category[] = [],
-		categoriesObjectStoreHelper: IDBObjectStoreHelper<Category>
-	) {
+	constructor(dbHelper: IDBDatabaseManager<typeof todoAppDB>, initialCategories: Category[] = []) {
+		this.#db = dbHelper;
 		this.#svelteCategoriesStore = new Categories(initialCategories);
-		this.#categoriesObjectStoreHelper = categoriesObjectStoreHelper;
 	}
 
 	get store() {
 		return this.#svelteCategoriesStore;
+	}
+
+	get #objectStore() {
+		return this.#db.transaction(['categories']).objectStore('categories');
 	}
 
 	async add({ name }: Pick<Category, 'name'>): StoreWriteOperationResult<Category> {
@@ -62,16 +64,19 @@ export class CategoryStore {
 		};
 
 		this.#svelteCategoriesStore.add(newCategory);
-		return await this.#categoriesObjectStoreHelper.add(newCategory);
+		return await this.#objectStore.add(newCategory);
 	}
 
 	async remove(id: Category['id']): StoreWriteOperationResult<Category> {
 		this.#svelteCategoriesStore.remove(id);
-		return await this.#categoriesObjectStoreHelper.remove(id);
+		return await this.#objectStore.remove(id);
 	}
 
-	async update(id: Category['id'], updateInfo: Partial<Category>): StoreWriteOperationResult<Category> {
+	async update(
+		id: Category['id'],
+		updateInfo: Partial<Category>
+	): StoreWriteOperationResult<Category> {
 		this.#svelteCategoriesStore.update(id, updateInfo);
-		return await this.#categoriesObjectStoreHelper.update(id, updateInfo);
+		return await this.#objectStore.update(id, updateInfo);
 	}
 }

@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { getTodoAppDBHelper } from '$lib/store/setting/db';
+	import { getTodoAppDB } from '$lib/store/setting/db';
 	import { isEmpty } from '$lib/utils';
 	import { onMount } from 'svelte';
 	import { CategoryStore, type Category } from '$lib/store';
 	import { PageContainer } from '$lib/components';
-	import { IDBObjectStoreHelper } from '$lib/idb-helpers';
 
 	let categoryStore = $state<CategoryStore | undefined>();
 	let creatingCategory = $state<boolean>(false);
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDBHelper();
+		const dbHelper = await getTodoAppDB();
+		const transaction = dbHelper.transaction(['todos']);
 
 		async function makeCategoriessStore() {
-			const storeHelper = new IDBObjectStoreHelper<Category>(dbHelper.db, 'todos');
+			const storeHelper = transaction.objectStore<Category>('todos');
 			const allCategories = await storeHelper.getAll();
-			categoryStore = new CategoryStore(allCategories, storeHelper);
+			categoryStore = new CategoryStore(dbHelper, allCategories);
 		}
 
 		await makeCategoriessStore();
