@@ -1,4 +1,4 @@
-import type { DBSetting } from "$lib/idb-helpers";
+import type { DBSetting } from "$lib/idb-wrappers";
 
 export type DBSettingFromDBSettings<T extends readonly DBSetting[]> = T[number];
 

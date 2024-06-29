@@ -3,7 +3,7 @@ import {
 	type DBSetting,
 	type IndexSetting,
 	type InitDBHandlers
-} from '$lib/idb-helpers';
+} from '$lib/idb-wrappers';
 import type { DBNameFromDBSettings, DBSettingFromDBSettings } from './types';
 
 const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {

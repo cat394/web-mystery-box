@@ -1,4 +1,4 @@
-import type { IDBDatabaseManager } from '$lib/idb-helpers';
+import type { IDBDatabaseManager } from '$lib/idb-wrappers';
 import { db, todoAppDB } from './seed';
 
 export async function getTodoAppDB(): Promise<IDBDatabaseManager<typeof todoAppDB>> {

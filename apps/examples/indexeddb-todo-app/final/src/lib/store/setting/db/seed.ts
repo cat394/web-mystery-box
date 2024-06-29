@@ -1,5 +1,5 @@
-import type { DBSetting } from "$lib/idb-helpers";
-import { initDB } from "./init-function";
+import type { DBSetting } from '$lib/idb-wrappers';
+import { initDB } from './init-function';
 
 export const todoAppDB = {
 	dbName: 'todoApp',

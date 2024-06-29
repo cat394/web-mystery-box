@@ -2,7 +2,7 @@ import type {
 	StoreWriteOperationResult,
 	EssentialFields,
 	IDBDatabaseManager
-} from '$lib/idb-helpers';
+} from '$lib/idb-wrappers';
 import { getId } from '$lib/utils';
 import { isEmpty } from '$lib/utils';
 import type { todoAppDB } from './setting/db/seed';
