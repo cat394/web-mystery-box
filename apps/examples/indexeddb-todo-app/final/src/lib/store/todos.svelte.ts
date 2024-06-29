@@ -1,5 +1,4 @@
 import type {
-	IDBObjectStoreManager,
 	StoreWriteOperationResult,
 	EssentialFields,
 	IDBDatabaseManager
