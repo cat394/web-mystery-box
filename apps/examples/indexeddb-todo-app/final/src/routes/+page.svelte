@@ -10,15 +10,15 @@
 	let creatingTodo: boolean = $state(false);
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDB();
-		const transaction = dbHelper.transaction(['todos', 'categories']);
+		const todoAppDB = await getTodoAppDB();
+		const transaction = todoAppDB.transaction(['todos', 'categories']);
 
 		async function makeTodosStore() {
 			const objectStore = transaction.objectStore<Todo>('todos');
 
 			const allTodos = await objectStore.getAll();
 
-			todoStore = new TodoStore(dbHelper, allTodos);
+			todoStore = new TodoStore(todoAppDB, allTodos);
 		}
 
 		async function getCategories() {

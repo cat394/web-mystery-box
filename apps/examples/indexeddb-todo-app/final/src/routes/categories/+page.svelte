@@ -9,13 +9,13 @@
 	let creatingCategory = $state<boolean>(false);
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDB();
-		const transaction = dbHelper.transaction(['todos']);
+		const todoAppDB = await getTodoAppDB();
+		const transaction = todoAppDB.transaction(['todos']);
 
 		async function makeCategoriessStore() {
-			const storeHelper = transaction.objectStore<Category>('todos');
-			const allCategories = await storeHelper.getAll();
-			categoryStore = new CategoryStore(dbHelper, allCategories);
+			const todosObjectStore = transaction.objectStore<Category>('todos');
+			const allCategories = await todosObjectStore.getAll();
+			categoryStore = new CategoryStore(todoAppDB, allCategories);
 		}
 
 		await makeCategoriessStore();

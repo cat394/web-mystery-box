@@ -1,7 +1,6 @@
 // import { IDBDatabaseHelper, type DBSetting, type OpenDBHandlers, type IndexSetting } from "$lib/idb-helpers";
 // import type { DBNameFromDBSettings, DBSettingFromDBSettings } from "./types";
 
-
 // const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
 // 	const { name, keyPath, options } = indexSetting;
 
@@ -50,14 +49,14 @@
 // 			}
 // 		};
 
-// 		const dbHelper = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
+// 		const todoAppDB = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
 
-// 		const db = await dbHelper.init();
+// 		const db = await todoAppDB.init();
 
 // 		db.onversionchange = () => {
 // 			db.close();
 // 			alert('A new version of this page is ready, please reload or close this tab!');
 // 		};
 
-// 		return dbHelper;
+// 		return todoAppDB;
 // 	};

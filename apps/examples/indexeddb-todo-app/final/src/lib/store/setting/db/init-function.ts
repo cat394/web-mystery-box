@@ -57,9 +57,9 @@ export const initDB =
 			}
 		};
 
-		const dbHelper = new IDBDatabaseManager<T2>(dbName, dbVersion, handlers);
+		const todoAppDB = new IDBDatabaseManager<T2>(dbName, dbVersion, handlers);
 
-		await dbHelper.init();
+		await todoAppDB.init();
 
-		return dbHelper;
+		return todoAppDB;
 	};

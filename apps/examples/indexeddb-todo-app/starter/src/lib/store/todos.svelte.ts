@@ -53,16 +53,14 @@
 // }
 // -----------------------------------------------------------------------------------------------
 
-
 // Part10-----------------------------------------------------------------------------------------
 
 // export class TodoStore {
 //  #db: IDBDatabaseManager<typeof todoAppDB>;
 //  #svelteTodosStore: Todos;
 
-
-//  constructor(dbHelper: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
-//    this.#db = dbHelper;
+//  constructor(todoAppDB: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
+//    this.#db = todoAppDB;
 //    this.#svelteTodosStore = new Todos(initialTodos);
 //  }
 

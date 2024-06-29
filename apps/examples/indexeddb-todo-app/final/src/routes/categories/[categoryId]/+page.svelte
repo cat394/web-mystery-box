@@ -11,12 +11,12 @@
 	let todoStore: TodoStore | undefined = $state();
 
 	onMount(async () => {
-		const dbHelper = await getTodoAppDB();
-		const transaction = dbHelper.transaction(['todos', 'categories']);
+		const todoAppDB = await getTodoAppDB();
+		const transaction = todoAppDB.transaction(['todos', 'categories']);
 
 		async function findCategoryName() {
-			const storeHelper = transaction.objectStore<Category>('categories');
-			categoryName = (await storeHelper.get(categoryId)).name;
+			const categoriesObjectStore = transaction.objectStore<Category>('categories');
+			categoryName = (await categoriesObjectStore.get(categoryId)).name;
 		}
 
 		async function getCategoryTodos() {
@@ -25,7 +25,7 @@
 				.objectStore<Todo>('todos')
 				.index<'todos'>('category')
 				.getAll(range);
-			todoStore = new TodoStore(dbHelper, todos);
+			todoStore = new TodoStore(todoAppDB, todos);
 		}
 
 		await Promise.all([findCategoryName(), getCategoryTodos()]);

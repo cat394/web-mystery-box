@@ -44,8 +44,8 @@ export class CategoryStore {
 	#db: IDBDatabaseManager<typeof todoAppDB>;
 	#svelteCategoriesStore: Categories;
 
-	constructor(dbHelper: IDBDatabaseManager<typeof todoAppDB>, initialCategories: Category[] = []) {
-		this.#db = dbHelper;
+	constructor(todoAppDB: IDBDatabaseManager<typeof todoAppDB>, initialCategories: Category[] = []) {
+		this.#db = todoAppDB;
 		this.#svelteCategoriesStore = new Categories(initialCategories);
 	}
 
