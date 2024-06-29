@@ -1,25 +1,58 @@
 // Part8-------------------------------------------------------------------------------------------
 
-// export interface Todo {}
+// import { getId } from "$lib/utils";
+// import type { EssentialFields } from '$lib/idb-helpers';
+
+// export interface Todo extends EssentialFields {
+// 	todo: string;
+// 	completed: boolean;
+// 	createdAt: number;
+// }
 
 // export class Todos {
-// 	// These arrays should be reactive!
+
+//  // We want to make these arrays reactive!
 // 	todos = [];
-// 	remaining = [];
-// 	finished = [];
+// 	remaining = this.todos.filter((todo) => !todo.completed));
+// 	finished = this.todos.filter((todo) => todo.completed));
 
 // 	constructor(initialTodos: Todo[]) {
 // 		this.todos = initialTodos;
 // 	}
 
-// 	add() {}
+//  add(todo: Todo['todo']): Todo['id'] {
+//    const todoId = getId();
 
-// 	remove() {}
+// 	  const newTodo = {
+//      id: todoId,
+//      todo,
+//      completed: false,
+//      createdAt: Date.now()
+//    }
 
-// 	update() {}
+//    this.todos.push(newTodo);
+
+// 	  return todoId;
+//  }
+
+// 	remove(id: Todo['id']): Todo['id'] {
+// 		this.todos = this.todos.filter((todo) => todo.id !== id);
+// 		return id;
+// 	}
+
+// 	update(id: Todo['id'], updateInfo: Partial<Todo>): Todo['id'] {
+// 		this.todos = this.todos.map((todo) => {
+// 			if (todo.id !== id) return todo;
+
+// 			const merged = { ...todo, ...updateInfo };
+
+// 			return merged;
+// 		});
+// 		return id;
+// 	}
 // }
-
 // -----------------------------------------------------------------------------------------------
+
 
 // Part10-----------------------------------------------------------------------------------------
 
