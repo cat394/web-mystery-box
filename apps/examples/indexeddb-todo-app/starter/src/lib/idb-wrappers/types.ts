@@ -1,6 +1,6 @@
 export interface EssentialFields {
 	id: IDBValidKey;
-};
+}
 
 export type DBSetting = { dbName: string; dbVersion: number; objectStores: StoreDetail[] };
 
@@ -21,10 +21,7 @@ export interface OpenDBHandlers {
 	onblocked: (event: IDBVersionChangeEvent) => void;
 }
 export interface CursorHandler {
-	onsuccess: (
-		resolve: (value: any) => void,
-		cursor: IDBCursorWithValue
-	) => ReturnType<PromiseConstructor['resolve']>;
+	onsuccess: (cursor: IDBCursorWithValue) => void;
 }
 
 export type StoreWriteOperationResult<T extends IDBValidKey> = Promise<T>;

@@ -181,7 +181,8 @@ export class IDBIndexManager<RecordType extends EssentialFields> extends IDBHelp
 		return new Promise((resolve, reject) => {
 			request.onsuccess = (event: Event) => {
 				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-				cursorHandler.onsuccess(resolve, cursor);
+				cursorHandler.onsuccess(cursor);
+				resolve();
 			};
 			request.onerror = (event: Event) => {
 				const error = (event.target as IDBRequest).error;

@@ -24,10 +24,7 @@ export interface InitDBHandlers {
 	onversionchange: InitDBHandler;
 }
 export interface CursorHandler {
-	onsuccess: (
-		resolve: (value: any) => void,
-		cursor: IDBCursorWithValue
-	) => ReturnType<PromiseConstructor['resolve']>;
+	onsuccess: (cursor: IDBCursorWithValue) => void;
 }
 
 export type StoreWriteOperationResult<T extends EssentialFields> = Promise<T['id']>;
