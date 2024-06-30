@@ -59,8 +59,8 @@
 //  #db: IDBDatabaseManager<typeof todoAppDB>;
 //  #svelteTodosStore: Todos;
 
-//  constructor(todoAppDB: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
-//    this.#db = todoAppDB;
+//  constructor(todoAppDBManager: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
+//    this.#db = todoAppDBManager;
 //    this.#svelteTodosStore = new Todos(initialTodos);
 //  }
 
