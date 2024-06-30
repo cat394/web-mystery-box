@@ -50,8 +50,8 @@ export class TodoStore {
 	#db: IDBDatabaseManager<typeof todoAppDB>;
 	#svelteTodosStore: Todos;
 
-	constructor(todoAppDB: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
-		this.#db = todoAppDB;
+	constructor(dbManager: IDBDatabaseManager<typeof todoAppDB>, initialTodos: Todo[]) {
+		this.#db = dbManager;
 		this.#svelteTodosStore = new Todos(initialTodos);
 	}
 
