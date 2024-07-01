@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Todo, TodoStore, CategoryStore } from '$lib/store';
+	import type { Todo, TodoStore } from '$lib/store';
 	import { flip } from 'svelte/animate';
 	import { send, receive } from '$lib/animations/transition';
 
@@ -7,10 +7,9 @@
 		store: TodoStore;
 		todos: Todo[];
 		header: string;
-		labelMessage: string;
 	};
 
-	let { store, todos, header, labelMessage }: Props = $props();
+	let { store, todos, header }: Props = $props();
 </script>
 
 <section>
@@ -20,7 +19,7 @@
 			<li animate:flip={{ duration: 200 }} in:receive={{ key: id }} out:send={{ key: id }}>
 				<div class="todo-checkable-area">
 					<label>
-						<span class="sr-only">{labelMessage}</span>
+						<span class="sr-only">{completed ? 'Todo is remaining' : 'Todo is completed'}</span>
 						<input
 							type="checkbox"
 							checked={completed}

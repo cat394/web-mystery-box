@@ -7,20 +7,19 @@
 		store: TodoStore;
 		todos: Todo[];
 		header: string;
-		labelMessage: string;
 	};
 
-	let { store, todos, header, labelMessage }: Props = $props();
+	let { store, todos, header }: Props = $props();
 </script>
 
 <section>
 	<h2>{header}</h2>
-	<ul>
+	<ul data-testid={header}>
 		{#each todos as { id, completed, todo } ({ id })}
 			<li animate:flip={{ duration: 200 }} in:receive={{ key: id }} out:send={{ key: id }}>
 				<div class="todo-checkable-area">
 					<label>
-						<span class="sr-only">{labelMessage}</span>
+						<span class="sr-only">{completed ? 'Todo is remaining' : 'Todo is completed'}</span>
 						<input
 							type="checkbox"
 							checked={completed}

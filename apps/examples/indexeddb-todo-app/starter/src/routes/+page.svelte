@@ -46,7 +46,6 @@
 							store={todosStore}
 							todos={todosStore.store.remaining}
 							header="Remaining:"
-							labelMessage="Todo is completed!"
 						/>
 					</div>
 					<div class="finished">
@@ -54,7 +53,6 @@
 							store={todosStore}
 							todos={todosStore.store.finished}
 							header="Finished:"
-							labelMessage="Todo is remaining!"
 						/>
 					</div>
 				{/if}
