@@ -29,7 +29,8 @@
 					<p>{todo}</p>
 				</div>
 				<button class="trash-btn border-rounded" onclick={async () => await store.remove(id)}>
-					<iconify-icon icon="iconoir:trash-solid" aria-label="Remove todo"></iconify-icon>
+					<span class="sr-only">Remove todo</span>
+					<iconify-icon icon="iconoir:trash-solid"></iconify-icon>
 				</button>
 			</li>
 		{/each}
