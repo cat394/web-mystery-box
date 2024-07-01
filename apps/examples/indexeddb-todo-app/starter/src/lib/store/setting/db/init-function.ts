@@ -53,9 +53,9 @@
 // 			}
 // 		};
 
-// 		const todoAppDB = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
+// 		const dbManager = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
 
-// 		const db = await todoAppDB.init();
+// 		await dbManager.init();
 
-// 		return todoAppDB;
+// 		return dbManager;
 // 	};
