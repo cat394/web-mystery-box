@@ -7,9 +7,7 @@ export const todoAppDB = {
 	objectStores: [
 		{
 			name: 'todos',
-			options: {
-				keyPath: 'id'
-			},
+			keyPath: 'id',
 			indexes: [
 				{
 					name: 'category',
@@ -20,9 +18,7 @@ export const todoAppDB = {
 		},
 		{
 			name: 'categories',
-			options: {
-				keyPath: 'id'
-			},
+			keyPath: 'id',
 			indexes: [
 				{
 					name: 'name',

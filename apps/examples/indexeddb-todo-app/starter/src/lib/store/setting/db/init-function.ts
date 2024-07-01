@@ -1,5 +1,10 @@
-// import { IDBDatabaseHelper, type DBSetting, type OpenDBHandlers, type IndexSetting } from "$lib/idb-helpers";
-// import type { DBNameFromDBSettings, DBSettingFromDBSettings } from "./types";
+// import {
+// 	IDBDatabaseManager,
+// 	type DBSetting,
+// 	type IndexSetting,
+// 	type InitDBHandlers
+// } from '$lib/idb-wrappers';
+// import type { DBNameFromDBSettings, DBSettingFromDBSettings } from './types';
 
 // const createIndex = (store: IDBObjectStore) => (indexSetting: IndexSetting) => {
 // 	const { name, keyPath, options } = indexSetting;
@@ -13,7 +18,7 @@
 // 	<T1 extends readonly DBSetting[]>(dbSettings: T1) =>
 // 	async <T2 extends DBSettingFromDBSettings<T1>>(
 // 		dbName: DBNameFromDBSettings<T1>
-// 	): Promise<IDBDatabaseHelper<T2>> => {
+// 	): Promise<IDBDatabaseManager<T2>> => {
 // 		const dbSetting = dbSettings.find((dbSetting) => dbSetting.dbName === dbName);
 
 // 		if (!dbSetting) {
@@ -22,14 +27,13 @@
 
 // 		const { objectStores, dbVersion } = dbSetting;
 
-// 		const openDBHandlers: OpenDBHandlers = {
-// 			onupgradeneeded: (event: IDBVersionChangeEvent) => {
-// 				const db = (event.target as IDBOpenDBRequest).result;
+// 		const handlers: InitDBHandlers = {
+// 			onupgradeneeded: (db: IDBDatabase) => {
 // 				objectStores.forEach((store) => {
 // 					let objectStore: IDBObjectStore;
 
 // 					if (!db.objectStoreNames.contains(store.name)) {
-// 						objectStore = db.createObjectStore(store.name, store.options);
+// 						objectStore = db.createObjectStore(store.name, { keyPath: store.keyPath });
 // 					} else {
 // 						const transaction = db.transaction(store.name);
 // 						objectStore = transaction.objectStore(store.name);
@@ -47,13 +51,13 @@
 // 					window.location.reload();
 // 				}
 // 			},
-//       onversionchange: (db: IDBDatabase) => {
+// 			onversionchange: (db: IDBDatabase) => {
 // 				db.close();
 // 				alert('A new version of this page is ready, please reload or close this tab!');
 // 			}
 // 		};
 
-// 		const dbManager = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
+// 		const dbManager = new IDBDatabaseManager<T2>(dbName, dbVersion, handlers);
 
 // 		await dbManager.init();
 

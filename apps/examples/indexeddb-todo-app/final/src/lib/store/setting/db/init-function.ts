@@ -33,7 +33,7 @@ export const initDB =
 					let objectStore: IDBObjectStore;
 
 					if (!db.objectStoreNames.contains(store.name)) {
-						objectStore = db.createObjectStore(store.name, store.options);
+						objectStore = db.createObjectStore(store.name, { keyPath: store.keyPath });
 					} else {
 						const transaction = db.transaction(store.name);
 						objectStore = transaction.objectStore(store.name);

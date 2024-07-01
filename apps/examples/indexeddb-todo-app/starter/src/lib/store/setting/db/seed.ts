@@ -1,5 +1,5 @@
-// import type { DBSetting } from "$lib/idb-helpers";
-// import { initDB } from "./init-function";
+// import type { DBSetting } from '$lib/idb-wrappers';
+// import { initDB } from './init-function';
 
 // export const todoAppDB = {
 // 	dbName: 'todoApp',
@@ -7,29 +7,7 @@
 // 	objectStores: [
 // 		{
 // 			name: 'todos',
-// 			options: {
-// 				keyPath: 'id'
-// 			},
-// 			indexes: [
-// 				{
-// 					name: 'category',
-// 					keyPath: 'categoryIds',
-// 					options: { multiEntry: true }
-// 				}
-// 			]
-// 		},
-// 		{
-// 			name: 'categories',
-// 			options: {
-// 				keyPath: 'id'
-// 			},
-// 			indexes: [
-// 				{
-// 					name: 'name',
-// 					keyPath: 'name',
-// 					options: { unique: true }
-// 				}
-// 			]
+// 			keyPath: 'id'
 // 		}
 // 	]
 // } as const satisfies DBSetting;
