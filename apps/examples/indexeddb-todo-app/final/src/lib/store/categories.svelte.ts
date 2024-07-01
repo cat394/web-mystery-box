@@ -44,8 +44,8 @@ export class CategoryStore {
 	#db: IDBDatabaseManager<typeof todoAppDB>;
 	#svelteCategoriesStore: Categories;
 
-	constructor(todoAppDB: IDBDatabaseManager<typeof todoAppDB>, initialCategories: Category[] = []) {
-		this.#db = todoAppDB;
+	constructor(dbManager: IDBDatabaseManager<typeof todoAppDB>, initialCategories: Category[] = []) {
+		this.#db = dbManager;
 		this.#svelteCategoriesStore = new Categories(initialCategories);
 	}
 
@@ -54,7 +54,7 @@ export class CategoryStore {
 	}
 
 	get #objectStore() {
-		return this.#db.transaction(['categories']).objectStore('categories');
+		return this.#db.transaction(['categories'], 'readwrite').objectStore('categories');
 	}
 
 	async add({ name }: Pick<Category, 'name'>): StoreWriteOperationResult<Category> {

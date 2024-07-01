@@ -60,7 +60,7 @@ export class TodoStore {
 	}
 
 	get #objectStore() {
-		return this.#db.transaction(['todos']).objectStore<Todo>('todos');
+		return this.#db.transaction(['todos'], 'readwrite').objectStore<Todo>('todos');
 	}
 
 	async add({
