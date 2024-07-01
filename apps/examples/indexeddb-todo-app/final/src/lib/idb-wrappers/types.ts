@@ -12,7 +12,7 @@ export type IndexSetting = {
 
 export type StoreDetail = {
 	name: string;
-	keyPath: 'id',
+	options: IDBObjectStoreParameters,
 	indexes?: IndexSetting[];
 };
 
