@@ -23,7 +23,7 @@ export interface InitDBHandlers {
 	onblocked: InitDBHandler;
 	onversionchange: InitDBHandler;
 }
-export interface CursorHandler {
+export interface CursorHandlers {
 	onsuccess: (cursor: IDBCursorWithValue) => void;
 }
 

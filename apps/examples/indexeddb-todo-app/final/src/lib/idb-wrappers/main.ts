@@ -1,5 +1,5 @@
 import type {
-	CursorHandler,
+	CursorHandlers,
 	DBNameFromDBSetting,
 	DBSetting,
 	DBVersionFromDBSetting,
@@ -173,7 +173,7 @@ export class IDBIndexManager<RecordType extends EssentialFields> extends IDBHelp
 	}
 
 	async openCursor(
-		cursorHandler: CursorHandler,
+		cursorHandlers: CursorHandlers,
 		query?: RecordType['id'] | IDBKeyRange,
 		direction?: IDBCursorDirection
 	): Promise<void> {
@@ -181,7 +181,7 @@ export class IDBIndexManager<RecordType extends EssentialFields> extends IDBHelp
 		return new Promise((resolve, reject) => {
 			request.onsuccess = (event: Event) => {
 				const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-				cursorHandler.onsuccess(cursor);
+				cursorHandlers.onsuccess(cursor);
 				resolve();
 			};
 			request.onerror = (event: Event) => {

@@ -211,8 +211,8 @@
     getAll(query?: IDBKeyRange, count?: number) -> Promise<RecordType[]>
     - Retrieves all records matching the query, up to the specified count.
 
-    openCursor(cursorHandler: CursorHandler, query?: RecordType['id'] | IDBKeyRange, direction?: IDBCursorDirection) -> Promise<void>
-    - Opens a cursor to iterate over records in the index, invoking the cursorHandler for each record.
+    openCursor(cursorHandlers: CursorHandlers, query?: RecordType['id'] | IDBKeyRange, direction?: IDBCursorDirection) -> Promise<void>
+    - Opens a cursor to iterate over records in the index, invoking the cursorHandlers for each record.
 
   - Properties
 

@@ -46,17 +46,16 @@
 // 				if (reloadOK) {
 // 					window.location.reload();
 // 				}
+// 			},
+//       onversionchange: (db: IDBDatabase) => {
+// 				db.close();
+// 				alert('A new version of this page is ready, please reload or close this tab!');
 // 			}
 // 		};
 
 // 		const todoAppDB = new IDBDatabaseHelper<T2>(dbName, dbVersion, openDBHandlers);
 
 // 		const db = await todoAppDB.init();
-
-// 		db.onversionchange = () => {
-// 			db.close();
-// 			alert('A new version of this page is ready, please reload or close this tab!');
-// 		};
 
 // 		return todoAppDB;
 // 	};

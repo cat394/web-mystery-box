@@ -16,11 +16,11 @@ type StoreDetail = {
 	indexes?: IndexSetting[];
 };
 
-export interface OpenDBHandlers {
+export interface InitDBHandlers {
 	onupgradeneeded: (event: IDBVersionChangeEvent) => void;
 	onblocked: (event: IDBVersionChangeEvent) => void;
 }
-export interface CursorHandler {
+export interface CursorHandlers {
 	onsuccess: (cursor: IDBCursorWithValue) => void;
 }
 
