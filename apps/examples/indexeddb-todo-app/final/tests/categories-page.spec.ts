@@ -37,9 +37,7 @@ test.describe('Categories page test', () => {
 		await page.getByLabel('Category name:').click();
 		await page.getByLabel('Category name:').fill('Category1');
 		await page.getByRole('button', { name: 'Add category' }).click();
-		await expect(
-			page.getByRole('link', { name: 'Category1'})
-		).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Category1'})).toBeVisible();
 	});
 
 	test('should navigate to the correct category URL when a genre link is clicked', async ({ page }) => {
@@ -49,4 +47,12 @@ test.describe('Categories page test', () => {
 		await page.getByRole('link', { name: 'Category1' }).click()
     await expect(page).toHaveURL(/\/categories\/.*/);
 	});
+
+  test('should display the correct category title when navigating to a category page', async ({ page }) => {
+    await page.getByLabel('Category name:').click();
+    await page.getByLabel('Category name:').fill('Category1');
+    await page.getByRole('button', { name: 'Add category' }).click();
+    await page.getByRole('link', { name: 'Category1' }).click();
+    await expect(page.getByRole('heading', { name: 'Category: Category1' })).toBeVisible();
+  });
 });
