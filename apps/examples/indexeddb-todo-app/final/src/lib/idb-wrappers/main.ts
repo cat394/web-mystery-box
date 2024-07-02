@@ -46,9 +46,10 @@ class IDBTransactionManager<T extends DBSetting> extends IDBHelper {
 		});
 	}
 
-	objectStore<RecordType extends EssentialFields>(
-		storeName: ObjectStoreNameFromDBSetting<T>
-	): IDBObjectStoreManager<T, RecordType> {
+	objectStore<
+		RecordType extends EssentialFields,
+		StoreName extends ObjectStoreNameFromDBSetting<T> = any
+	>(storeName: StoreName): IDBObjectStoreManager<T, RecordType, StoreName> {
 		return this.#objectStores[storeName];
 	}
 }
@@ -104,12 +105,13 @@ export class IDBDatabaseManager<T extends DBSetting = DBSetting> extends IDBHelp
 }
 
 export class IDBObjectStoreManager<
-	T1 extends DBSetting = any,
-	T2 extends EssentialFields = any
+	DBSettingType extends DBSetting = any,
+	RecordType extends EssentialFields = any,
+	StoreNameType extends ObjectStoreNameFromDBSetting<DBSettingType> = any
 > extends IDBHelper {
 	constructor(
 		public transaction: IDBTransaction,
-		public storeName: ObjectStoreNameFromDBSetting<T1>
+		public storeName: StoreNameType
 	) {
 		super();
 	}
@@ -118,39 +120,37 @@ export class IDBObjectStoreManager<
 		return this.transaction.objectStore(this.storeName);
 	}
 
-	async get(key: T2['id']): Promise<T2> {
+	async get(key: RecordType['id']): Promise<RecordType> {
 		const request = this.#objectStore.get(key);
-		return await super.requestResult<T2>(request);
+		return await super.requestResult<RecordType>(request);
 	}
 
-	async getAll(query?: IDBKeyRange, count?: number): Promise<T2[]> {
+	async getAll(query?: IDBKeyRange, count?: number): Promise<RecordType[]> {
 		const request = this.#objectStore.getAll(query, count);
-		return await super.requestResult<T2[]>(request);
+		return await super.requestResult<RecordType[]>(request);
 	}
 
-	async add(newData: T2): StoreWriteOperationResult<T2> {
+	async add(newData: RecordType): StoreWriteOperationResult<RecordType> {
 		const request = this.#objectStore.add(newData);
-		return await super.requestResult<T2['id']>(request);
+		return await super.requestResult<RecordType['id']>(request);
 	}
 
-	async update(key: T2['id'], newData: Partial<T2>): StoreWriteOperationResult<T2> {
+	async update(key: RecordType['id'], newData: Partial<RecordType>): StoreWriteOperationResult<RecordType> {
 		const currentData = await this.get(key);
 		const merged = { ...currentData, ...newData };
 		const request = this.#objectStore.put(merged);
-		await super.requestResult<T2>(request);
+		await super.requestResult<RecordType>(request);
 		return key;
 	}
 
-	async remove(key: T2['id']): StoreWriteOperationResult<T2> {
+	async remove(key: RecordType['id']): StoreWriteOperationResult<RecordType> {
 		const request = this.#objectStore.delete(key);
 		await super.requestResult<undefined>(request);
 		return key;
 	}
 
-	index<const K extends ObjectStoreNameFromDBSetting<T1>>(
-		indexName: IndexNameFromObjectStore<T1, K>
-	): IDBIndexManager<T2> {
-		return new IDBIndexManager<T2>(this.#objectStore, indexName as string);
+	index(indexName: IndexNameFromObjectStore<DBSettingType, StoreNameType>): IDBIndexManager<RecordType> {
+		return new IDBIndexManager<RecordType>(this.#objectStore, indexName as string);
 	}
 }
 

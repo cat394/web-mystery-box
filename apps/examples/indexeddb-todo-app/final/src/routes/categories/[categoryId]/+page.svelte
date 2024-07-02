@@ -22,8 +22,8 @@
 		async function getCategoryTodos() {
 			const range = IDBKeyRange.only(categoryId);
 			const todos = await transaction
-				.objectStore<Todo>('todos')
-				.index<'todos'>('category')
+				.objectStore<Todo, 'todos'>('todos')
+				.index('category')
 				.getAll(range);
 			todoStore = new TodoStore(todoAppDB, todos);
 		}
