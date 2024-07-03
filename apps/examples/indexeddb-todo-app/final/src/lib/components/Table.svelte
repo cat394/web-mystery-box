@@ -8,12 +8,20 @@
 	const headers = Object.keys(dataObjects[0]);
 
 	function dataToString(data: unknown): string {
-		if (typeof data === 'object') {
-			return JSON.stringify(data);
-		} else {
-			return data ? data.toString() : 'undefined';
-		}
-	}
+    if (data === undefined) {
+        return 'undefined';
+    } else if (data === null) {
+        return 'null';
+    } else if (typeof data === 'object') {
+        try {
+            return JSON.stringify(data);
+        } catch (error) {
+            return String(data);
+        }
+    } else {
+        return String(data);
+    }
+}
 </script>
 
 <table>
