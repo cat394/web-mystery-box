@@ -10,11 +10,11 @@
 
 	onMount(async () => {
 		const todoAppDB = await getTodoAppDB();
-		const transaction = todoAppDB.transaction(['todos']);
+		const transaction = todoAppDB.transaction(['categories']);
 
 		async function makeCategoriessStore() {
-			const todosObjectStore = transaction.objectStore<Category>('todos');
-			const allCategories = await todosObjectStore.getAll();
+			const categoriesObjectStore = transaction.objectStore<Category>('categories');
+			const allCategories = await categoriesObjectStore.getAll();
 			categoryStore = new CategoryStore(todoAppDB, allCategories);
 		}
 
@@ -32,7 +32,7 @@
 
 		const formData = new FormData(form);
 
-		const categoryName = formData.get('todo') as string;
+		const categoryName = formData.get('category') as string;
 
 		if (!categoryName) return;
 
@@ -52,7 +52,7 @@
 					<legend>Create your category!</legend>
 					<label>
 						<span class="label-text">Category name:</span>
-						<input type="text" name="todo" required autocomplete="off" />
+						<input type="text" name="category" required autocomplete="off" />
 					</label>
 					<button class="primary-btn">Add category</button>
 				</fieldset>
