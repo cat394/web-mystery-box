@@ -1,4 +1,4 @@
-@layer reset, base, default, helpers, utils;
+@layer reset, base, default, helpers, utils, component;
 
 @layer reset {
 	button {
@@ -134,12 +134,12 @@
 		--input-text-field-color-hsl: var(--bg-primary-hsl);
 		--input-text-text-color: var(--color-primary-10);
 
-		--divider-color: var(--accent-secondary);
-
 		--link-primary: var(--accent-primary);
 		--link-secondary: var(--accent-secondary);
 
 		--form-space: 1.3rem;
+
+		--radius-round: 1e5px;
 	}
 	html {
 		accent-color: var(--accent-secondary);
@@ -251,7 +251,7 @@
 		:scope {
 			color: var(--text-secondary);
 			background-color: var(--bg-secondary);
-	
+
 			a {
 				color: var(--link-secondary);
 			}
@@ -290,10 +290,31 @@
 			animation: 300ms push ease-in-out;
 		}
 	}
-	hr.divider-inline-sm {
+	.divider-inline {
+		--_line-width: var(--line-width, 0.3px); 
 		height: 100%;
 		margin-inline: 5vw;
-		border-inline-start: 0.3px solid var(--divider-color);
+		border: var(--_line-width) solid var(--accent-secondary);
+	}
+	.pill {
+		/* Dynamic parts */
+		--_pill-bg: var(--pill-bg, black);
+		--_pill-text: var(--pill-text, white);
+		--_pill-outline: 1px solid var(--pill-outline, none);
+
+		/* Static parts */
+		font-size: 0.6em;
+		padding: 0.2rem 0.5rem;
+		border-radius: var(--radius-round);
+		width: fit-content;
+		background-color: var(--_pill-bg);
+		color: var(--_pill-text);
+		outline: var(--_pill-outline);
+
+		&.primary {
+			--pill-bg: var(--bg-primary);
+			--pill-text: var(--text-primary);
+		}
 	}
 }
 

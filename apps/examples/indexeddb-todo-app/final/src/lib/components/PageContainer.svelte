@@ -14,7 +14,7 @@
 	<section class="left">
 		{@render leftContent()}
 	</section>
-	<hr class="divider-inline-sm" />
+	<hr class="divider-inline" />
 	<section class="right">
 		{@render rightContent()}
 	</section>

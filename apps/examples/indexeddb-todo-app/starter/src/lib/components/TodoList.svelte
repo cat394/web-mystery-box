@@ -1,5 +1,7 @@
 <script lang="ts">
-	import type { Todo, TodoStore } from '$lib/store';
+	// import { onMount } from 'svelte';
+	// import { getTodoAppDB } from '$lib/store';
+	import { type Todo, type TodoStore, type Category } from '$lib/store';
 	import { flip } from 'svelte/animate';
 	import { send, receive } from '$lib/animations/transition';
 
@@ -10,13 +12,31 @@
 	};
 
 	let { store, todos, header }: Props = $props();
+
+	// let todoAppDB = $state<Awaited<ReturnType<typeof getTodoAppDB>> | undefined>();
+
+	// onMount(async () => {
+	// 	todoAppDB = await getTodoAppDB();
+	// });
+
+	// function getCategoryNameFromCategoryId(categoryId: Category['id']) {
+	// 	if (!todoAppDB) return;
+	// 	const transaction = todoAppDB.transaction(['categories']);
+	// 	const categoriesObjectStore = transaction.objectStore<Category>('categories');
+	// 	return categoriesObjectStore.get(categoryId);
+	// }
 </script>
 
 <section>
 	<h2>{header}</h2>
-	<ul>
-		{#each todos as { id, completed, todo } ({ id })}
-			<li animate:flip={{ duration: 200 }} in:receive={{ key: id }} out:send={{ key: id }}>
+	<ul data-testid={header}>
+		{#each todos as { id, completed, todo, categoryIds } ({ id })}
+			<li
+				class="todo"
+				animate:flip={{ duration: 200 }}
+				in:receive={{ key: id }}
+				out:send={{ key: id }}
+			>
 				<div class="todo-checkable-area">
 					<label>
 						<span class="sr-only">{completed ? 'Todo is remaining' : 'Todo is completed'}</span>
@@ -32,6 +52,15 @@
 					<span class="sr-only">Remove todo</span>
 					<iconify-icon icon="iconoir:trash-solid"></iconify-icon>
 				</button>
+				<!-- {#if todoAppDB && categoryIds}
+					<ul class="categories">
+						{#each categoryIds as categoryId}
+							{#await getCategoryNameFromCategoryId(categoryId) then category}
+								<li class="pill primary">{category!.name}</li>
+							{/await}
+						{/each}
+					</ul>
+				{/if} -->
 			</li>
 		{/each}
 	</ul>
@@ -45,19 +74,7 @@
 		display: grid;
 		row-gap: 1.3rem;
 	}
-	li {
-		/* layout */
-		width: fit-content;
-		display: flex;
-		align-items: center;
-		padding: 0.3rem 1rem;
-		border-radius: 0.5rem;
-		box-shadow: 0px 0px 10px 3px var(--accent-primary);
 
-		/* text */
-		font-size: var(--text-sm);
-		color: var(--white);
-	}
 	p {
 		padding-inline: 2em;
 	}
@@ -91,5 +108,30 @@
 			z-index: 1;
 			cursor: pointer;
 		}
+	}
+	.todo {
+		position: relative;
+
+		/* layout */
+		width: fit-content;
+		display: flex;
+		align-items: center;
+		padding: 0.3rem 1rem;
+		border-radius: 0.5rem;
+		box-shadow: 0px 0px 10px 3px var(--accent-primary);
+
+		/* text */
+		font-size: var(--text-sm);
+		color: var(--white);
+	}
+
+	.categories {
+		position: absolute;
+		top: 0;
+		transform: translateY(-50%);
+		right: 0;
+		width: 100%;
+		display: flex;
+		gap: 1rem;
 	}
 </style>
