@@ -61,8 +61,8 @@
 	{/snippet}
 	{#snippet rightContent()}
 		<section>
+			<h2>Your categories</h2>
 			{#if categoryStore && !isEmpty(categoryStore.store.categories)}
-				<h2>Your categories</h2>
 				<ul>
 					{#each categoryStore.store.categories as category}
 						<li>
